@@ -210,28 +210,29 @@
 
   
 
-    <div id="banner" class="banner" parallax=true
-        style="background: url('
-        /img/bg1.jpg') no-repeat center center; background-size: cover;">
-            <div class="full-bg-img">
-                <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-                    <div class="banner-text text-center fade-in-up">
-                        <div class="h2">
-                            
-                                <span id="subtitle" data-typed-text="More haste, less speed."></span>
-                                
-                        </div>
-                        
-                    </div>
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="An elegant Material-Design theme for Hexo"></span>
+          
+        </div>
 
-                    
-                        <div class="scroll-down-bar">
-                            <i class="iconfont icon-arrowdown"></i>
-                        </div>
-                        
-                </div>
-            </div>
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
     </div>
+  </div>
+</div>
+
 </div>
 
   </header>
@@ -385,31 +386,19 @@
 
   <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
   <script>
-    function typing(id, title){
-        var typed = new Typed('#' + id, {
-            strings: [
-              '  ',
-              title + "&nbsp;",
-            ],
-            cursorChar: "_",
-            typeSpeed: 55,
-            loop: false,
-        });
-        typed.stop();
-        $(document).ready(function () {
-            $(".typed-cursor").addClass("h2");
-            typed.start();
-        });
-    }
-    
-        fetch('https://v1.hitokoto.cn')
-        .then(response => response.json())
-        .then(data => {
-           typing("hitokoto", data.hitokoto  + '<br /> <br /> <h4>'+ '——' + '《' + data.from + '》' + '</h4>')
-        })
-        .catch(console.error)
-    
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
   </script>
+
 
 
 
