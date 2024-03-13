@@ -217,7 +217,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="人生苦短，我再睡会"></span>
+            <span id="subtitle" data-typed-text="More haste, less speed."></span>
           
         </div>
 
@@ -238,6 +238,19 @@
   </header>
 
   <main>
+  <span class="h2" id="subtitle">
+    
+</span>
+
+
+<br>
+<span class="h2" id="hitokoto">
+    
+</span>
+
+
+
+</div>
     
       <div class="container nopadding-x-md">
         <div id="board"
@@ -348,7 +361,7 @@
     
     
       <span id="busuanzi_container_site_uv" style="display: none">
-        💟你是第 
+        ❤你是第 
         <span id="busuanzi_value_site_uv"></span>
          枚看到我的
       </span>
@@ -386,19 +399,31 @@
 
   <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
   <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var subtitle = document.getElementById('subtitle');
-      if (!subtitle || !typing) {
-        return;
-      }
-      var text = subtitle.getAttribute('data-typed-text');
-      
-        typing(text);
-      
-    })(window, document);
+    function typing(id, title){
+        var typed = new Typed('#' + id, {
+            strings: [
+              '  ',
+              title + "&nbsp;",
+            ],
+            cursorChar: "_",
+            typeSpeed: 55,
+            loop: false,
+        });
+        typed.stop();
+        $(document).ready(function () {
+            $(".typed-cursor").addClass("h2");
+            typed.start();
+        });
+    }
+    
+        fetch('https://v1.hitokoto.cn')
+        .then(response => response.json())
+        .then(data => {
+           typing("hitokoto", data.hitokoto  + '<br /> <br /> <h4>'+ '——' + '《' + data.from + '》' + '</h4>')
+        })
+        .catch(console.error)
+    
   </script>
-
 
 
 
@@ -427,10 +452,5 @@
   <noscript>
     <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
   </noscript>
-<!-- hexo injector body_end start -->
-  <div id="aplayer"></div>
-  <link defer rel="stylesheet" href="https://cdn.staticfile.org/aplayer/1.10.1/APlayer.min.css" />
-  <script src="https://cdn.staticfile.org/aplayer/1.10.1/APlayer.min.js"></script>
-  <script defer src="/js/aplayer.js"></script>
-<!-- hexo injector body_end end --></body>
+</body>
 </html>
