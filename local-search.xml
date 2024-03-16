@@ -8,7 +8,7 @@
     <link href="/2024/03/16/Unity-hyphen/"/>
     <url>/2024/03/16/Unity-hyphen/</url>
     
-    <content type="html"><![CDATA[<p>unity自带的text组件当需要换行时会自动把整个单词都移动到下一行，比如下面的情况:</p><p><img src="/Unity-hyphen/438bef10aae34a0eb4ff46cf3742f15d.gif" alt="请添加图片描述"></p><p>但当我们有一大段文字的时候这种换行规则会导致文字的右边不能完美的与边缘对齐，会空出来一大片，导致美观度降低。</p><p><img src="/Unity-hyphen/9a7456e200d14efbbb5a24fe32c42b62.png" alt="在这里插入图片描述"></p><p>所以采用在单词中间进行截断并且添加连词符（-）的方式来避免这种情况的产生。</p><p><img src="/Unity-hyphen/e1b6e52d2b754162bac5519d8216719e.png" alt="在这里插入图片描述"></p><p><img src="/Unity-hyphen/1bf063dd857a4f22af12f6018c722fb8.gif" alt="请添加图片描述"></p><p>Github链接：<br>    <a href="https://github.com/momohola/Unity-hyphen_util">https://github.com/momohola/Unity-hyphen_util</a></p><p><img src="/Unity-hyphen/image-20240316193038966.png" alt="image-20240316193038966"></p>]]></content>
+    <content type="html"><![CDATA[<p>unity自带的text组件当需要换行时会自动把整个单词都移动到下一行，比如下面的情况:</p><p><img src="/Unity-hyphen/438bef10aae34a0eb4ff46cf3742f15d.gif" alt="请添加图片描述"></p><p>但当我们有一大段文字的时候这种换行规则会导致文字的右边不能完美的与边缘对齐，会空出来一大片，导致美观度降低。</p><p><img src="/Unity-hyphen/9a7456e200d14efbbb5a24fe32c42b62.png" alt="在这里插入图片描述"></p><p>所以采用在单词中间进行截断并且添加连词符（-）的方式来避免这种情况的产生。</p><p><img src="/Unity-hyphen/e1b6e52d2b754162bac5519d8216719e.png" alt="在这里插入图片描述"></p><p><img src="/Unity-hyphen/1bf063dd857a4f22af12f6018c722fb8.gif" alt="请添加图片描述"></p><p>Github链接：<br>    <a href="https://github.com/momohola/Unity-hyphen_util">https://github.com/momohola/Unity-hyphen_util</a></p><p><img src="/2024/03/16/Unity-hyphen/image-20240316193038966.png" alt="image-20240316193038966"></p>]]></content>
     
     
     
@@ -17,19 +17,6 @@
       <tag>Unity</tag>
       
     </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="/2024/02/29/hello-world/"/>
-    <url>/2024/02/29/hello-world/</url>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
-    
-    
     
   </entry>
   
