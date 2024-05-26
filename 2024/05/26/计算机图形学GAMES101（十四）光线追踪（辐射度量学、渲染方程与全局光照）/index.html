@@ -1,0 +1,821 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/myTitleIcon.png">
+  <link rel="icon" href="/img/myTitleIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="莫予">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本节涉及内容：  辐射度量学（Basic radiometry） 光线的传播：反射方程以及渲染方程 全局光照  为什么要学辐射度量学？之前使用的Whittled style光线追踪很多物理量都没有精确的定义，导致生成的图像不真实。总之就是Whittled style光线追踪太拉了，需要一个更好的方法来代替。 辐射度量学（Basic radiometry） 辐射度量学主要是用来描述光照的 它定义了一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）">
+<meta property="og:url" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/index.html">
+<meta property="og:site_name" content="莫予的人间大宝藏">
+<meta property="og:description" content="本节涉及内容：  辐射度量学（Basic radiometry） 光线的传播：反射方程以及渲染方程 全局光照  为什么要学辐射度量学？之前使用的Whittled style光线追踪很多物理量都没有精确的定义，导致生成的图像不真实。总之就是Whittled style光线追踪太拉了，需要一个更好的方法来代替。 辐射度量学（Basic radiometry） 辐射度量学主要是用来描述光照的 它定义了一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002431.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002442.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002443.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_11,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002454.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002455.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002456.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002467.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/c65147a15d3c4d289b738f6f13f88cad.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/7f5aa253c27c401b8b5beb18d717d85b.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002468.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/d5e22c7c6cca49109909a3c6df678c59.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/4abbb88281064d25ab4782b598e96a83.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_18,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002479.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024710.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_19,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024811.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024812.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024813.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024814.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024815.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/6155ac11236f4e739f4fe8991615010d.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/85d3b0b7575b439e9cbbef26aecaf73a.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024916.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024917.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024918.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024919.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024920.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024921.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024922.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025023.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/86eca8eccd57452e9b17f5b5ee988188.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ceaaecd7d1a140df8d33c96c17a49aa8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025026.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025027.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025028.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025029.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025030.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025131.png">
+<meta property="article:published_time" content="2024-05-26T08:01:14.000Z">
+<meta property="article:modified_time" content="2024-05-26T08:02:54.677Z">
+<meta property="article:author" content="莫予">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="图形学">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+  
+  
+  
+  <title>计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照） - 莫予的人间大宝藏</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/scroll.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":55,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"F9Y5mCKv9ARqmAKZyYohD39E-gzGzoHsz","app_key":"SAkoCxXOO3Ug37vyt1y7vT2Z","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>莫予&#39;Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-26 16:01" pubdate>
+          2024年5月26日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    本文最后更新于 2024年5月26日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本节涉及内容：</p>
+<ul>
+<li>辐射度量学（Basic radiometry）</li>
+<li>光线的传播：反射方程以及渲染方程</li>
+<li>全局光照</li>
+</ul>
+<p>为什么要学辐射度量学？<br>之前使用的Whittled style光线追踪很多物理量都没有精确的定义，导致生成的图像不真实。总之就是Whittled style光线追踪太拉了，需要一个更好的方法来代替。</p>
+<h2 id="辐射度量学（Basic-radiometry）"><a href="#辐射度量学（Basic-radiometry）" class="headerlink" title="辐射度量学（Basic radiometry）"></a>辐射度量学（Basic radiometry）</h2><ul>
+<li>辐射度量学主要是用来描述光照的</li>
+<li>它定义了一系列的方法以及单位、属性</li>
+<li>精确测量光的空间特性</li>
+<li>以正确的物理方式进行光照计算</li>
+</ul>
+<h2 id="一些物理量的定义"><a href="#一些物理量的定义" class="headerlink" title="一些物理量的定义"></a>一些物理量的定义</h2><p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>Radiant flux还可以这样理解：假设前面有一个感光的平面，那么单位时间照射到这个平面的光线的强度<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002431.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002442.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="Radiant-Intensity（辐射强度）"><a href="#Radiant-Intensity（辐射强度）" class="headerlink" title="Radiant Intensity（辐射强度）"></a>Radiant Intensity（辐射强度）</h2><p>Radiant Intensity指每个单位立体角上的能量（power）</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002443.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="立体角（Solid-Angles）"><a href="#立体角（Solid-Angles）" class="headerlink" title="立体角（Solid Angles）"></a>立体角（Solid Angles）</h2><p>用弧度来表示一个角：<br>弧度：θ&#x3D;l&#x2F;r<br>一个圆的弧度：2π<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_11,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>立体角：<br>立体角就是弧度在三维空间的衍生，在三维空间中，从球心出发，射向球面，会形成一个锥体，然后用球面的面积A除以r^2^</p>
+<p>一个球的立体角是4π<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002454.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="单位立体角"><a href="#单位立体角" class="headerlink" title="单位立体角"></a>单位立体角</h2><p>单位立体角就是单位面积然后除以r^2^<br>θ：表示经度方向的角度<br>Φ：表示纬度方向的角度<br>dA：单位面积</p>
+<p>单位立体角：dω&#x3D;dA&#x2F;r^2^&#x3D;sinθ dθ dΦ<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002455.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>对于一个球，所有的单位面积的积分为：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002456.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>辐射度量中，表示三维空间中的方向通常使用ω（单位立体角）</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002467.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>知道了单位立体角，那么Radiant Intensity还可以从另一个角度进行理解。</p>
+<p>Radiant Intensity其实就是这个光源在单位立体角上的能量，我们对所有方向进行积分，可以得到power<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/c65147a15d3c4d289b738f6f13f88cad.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>Radiant Intensity其实就是power除以4π<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/7f5aa253c27c401b8b5beb18d717d85b.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="Irradiance"><a href="#Irradiance" class="headerlink" title="Irradiance"></a>Irradiance</h2><p>Irradiance是指物体表面单位面积上接收的能量</p>
+<p>lux表示Irradiance的单位<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002468.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>这里的Irradiance必须是垂直于光线的面积，或者说投影到垂直方向上的面积<br>比如向下面这种情况：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/d5e22c7c6cca49109909a3c6df678c59.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>如果是下面这种情况，物体是倾斜的那么它接收光线的面积其实是投影到垂直方向后的面积，即红色部分<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/4abbb88281064d25ab4782b598e96a83.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="Radiance"><a href="#Radiance" class="headerlink" title="Radiance"></a>Radiance</h2><p>描述光在传播过程中的属性<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_18,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>Radiance是一个表面在单位立体角，单位投影面积的情况下接收的功率，</p>
+<p>一个面的大小和辐射能量的方向是不固定的，我们要研究往一个方向辐射的能量就要确定这个面的大小和辐射方向。所以要结合两者，定义了某一个确定的微小的面dA，和某一个确定的方向dw</p>
+<p>方向就用单位立体角dw来表示<br>面积就用单位面积dA来表示</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167105002479.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="Radiance和Irradiance、Intensity的联系"><a href="#Radiance和Irradiance、Intensity的联系" class="headerlink" title="Radiance和Irradiance、Intensity的联系"></a>Radiance和Irradiance、Intensity的联系</h2><ul>
+<li>Irradiance：物体单位面积上接收的能量</li>
+<li>Intensity：单位立体角上接收的能量</li>
+</ul>
+<p>由上述定义可知：</p>
+<ul>
+<li>Radiance：是Irradiance在单位立体角上的能量</li>
+<li>Radiance：是Intensity在单位面积上的能量</li>
+</ul>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024710.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="Radiance：是Irradiance在单位立体角上的能量"><a href="#Radiance：是Irradiance在单位立体角上的能量" class="headerlink" title="Radiance：是Irradiance在单位立体角上的能量"></a>Radiance：是Irradiance在单位立体角上的能量</h2><p>这里理解成某一个确定微小面积上受到的所有能量（Irradiance），在一个方向ω上的分量<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_19,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="Radiance：是Intensity在单位面积上的能量"><a href="#Radiance：是Intensity在单位面积上的能量" class="headerlink" title="Radiance：是Intensity在单位面积上的能量"></a>Radiance：是Intensity在单位面积上的能量</h2><p>这里理解成一个确定的方向上辐射出来的所有能量（I），在一个微小面积上的分量。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024811.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="Irradiance和Radiance比较"><a href="#Irradiance和Radiance比较" class="headerlink" title="Irradiance和Radiance比较"></a>Irradiance和Radiance比较</h2><p>Irradiance：单位面积上所有方向接收的能量<br>Radiance：在单位面积上来自某一个方向的能量<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024812.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="双向辐射分布函数-Bidirectional-Reflectance-Distribution-Function-简称BRDF"><a href="#双向辐射分布函数-Bidirectional-Reflectance-Distribution-Function-简称BRDF" class="headerlink" title="双向辐射分布函数 (Bidirectional Reflectance Distribution Function 简称BRDF)"></a>双向辐射分布函数 (Bidirectional Reflectance Distribution Function 简称BRDF)</h2><p>理解了前面的三个概念之后就可以重新定义反射的概念了。</p>
+<p>反射可以理解为从某个方向进来然后反射到某个方向去的能量。可以用BRDF（反射方程）来描述这个过程。</p>
+<p>就考虑某一个微小面积dA从某各微笑立体角dw接收到的Irradiance，会被如何分配到各个不同的立体角上面去。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024813.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>BRDF就是 在微小面积dA，从某一个微小立体角dω<del>i</del>，接收到的Irradiance，会如何被分配到各个不同的立体角上去，算的是一个比例。</p>
+<p>对于任何一个出射方向，算出其Radiance的微分，除以Irradiance的微分，这就是BRDF的定义。</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024814.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>以某一个方向为例，然后我认为某一个着色点可以接收来自四面八方不同的光照，那么对于每一个入射方向，都会对应一个“入射方向→着色点→出射方向”这样的一个BRDF，那么我们就可以把每一个方向上dω的入射光的强度Radiance乘以cosθ乘以BRDF，然后把每一个入射方向上对出射方向的贡献都加起来，就得到了从反射方向看过去这个点的样子了<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024815.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>反射方程表明了光线到达着色点后被发射的光线属性。但是哪些光线可以到达着色点呢？<br>到达着色点的光线可以是光源发出的光线以及其他着色点反射的光线，所以任何出射的Radiance都可以作为其他着色点入射的Radiance，所以这是一个递归的过程。</p>
+<h2 id="渲染方程（Rendering-Equation）"><a href="#渲染方程（Rendering-Equation）" class="headerlink" title="渲染方程（Rendering Equation）"></a>渲染方程（Rendering Equation）</h2><p>一个物体的光线照射到物体后经过BRDF反射的光线是L<del>r</del>(p,ω<del>r</del>)<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/6155ac11236f4e739f4fe8991615010d.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>渲染方程：假如物体是一个自发光的物体，则直接把发出的光线加上就行</p>
+<p>渲染方程将一个物体的出射光线分成两部分构成：</p>
+<ul>
+<li>自己发射出去的光</li>
+<li>通过其他光源射入的，经过反射后的光</li>
+</ul>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/85d3b0b7575b439e9cbbef26aecaf73a.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="理解渲染方程"><a href="#理解渲染方程" class="headerlink" title="理解渲染方程"></a>理解渲染方程</h2><p>对于只有一个点光源的情况<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024916.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>对于有多个点光源的情况<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024917.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>对于有面光源的情况，可以将一个面光源理解为由一堆点光源组成。只需要对面光源所有点发出的光进行积分即可，如果光不是由光源发出的，而是别的物体反射来的，则只需要将别的物体看作光源就行。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024918.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>我们不知道反射光的Radiance是多少，同时也不知道从其他物体反射过来的光的Radiance是多少，其他白色部分是知道的。</p>
+<p>上面的是原式，下面的是简写<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024919.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>渲染方程最终可以写成下面的形式：<br>对于所有物体辐射出来的所有能量（L）可以写成 所有光源本身辐射出来的能量（E）加上 辐射出来的能量被反射之后的能量（KL）。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024920.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>写成这个形式是为了解出L<br>写成这种形式后就可以使用用泰勒展开，将其展开成I+K+K^2^+K^3^……<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024921.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050024922.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>如果光线一次都不弹射直接打到人的眼睛里，那么看到的就是光源E；如果光线弹射一次后打到人的眼睛里，看到的就是直接光照KE（包括阴影）；如果弹射两次，看到的就是间接光照；如果弹射多次就是间接光照的叠加。反射本身就是一种间接光照。</p>
+<h2 id="从光栅化可以做什么的角度来理解该公式"><a href="#从光栅化可以做什么的角度来理解该公式" class="headerlink" title="从光栅化可以做什么的角度来理解该公式"></a>从光栅化可以做什么的角度来理解该公式</h2><p>光栅化可以把物体投影到屏幕上，着色的工作对于的这里的直接光照。</p>
+<p>光栅化能够告诉我们光线传播的内容只有0次（E）和一次（KE）的弹射，后面的部分光栅化比较难完成。因为光线追踪后面的部分比较容易，这就是为什么要用光线追踪来解决光照的问题<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025023.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="全局光照"><a href="#全局光照" class="headerlink" title="全局光照"></a>全局光照</h2><p>光线弹射一次，就是直接光照；如果弹射两次，看到的就是间接光照。全局光照就是将光线弹射1次到n次所有的结果全部加起来。</p>
+<p>全局光照是直接和间接光照的集合。</p>
+<h2 id="直接光照和间接光照的影响"><a href="#直接光照和间接光照的影响" class="headerlink" title="直接光照和间接光照的影响"></a>直接光照和间接光照的影响</h2><p>这张图片只渲染了直接光照，也就是光源可以照到的地方是有颜色的，照不到的地方是黑色<br><img src="https://img-blog.csdnimg.cn/86eca8eccd57452e9b17f5b5ee988188.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>直接光照 加上 弹射一次间接光照的结果<br><img src="https://img-blog.csdnimg.cn/ceaaecd7d1a140df8d33c96c17a49aa8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>直接光照 加上弹射一次、两次和三次间接光照的结果<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025026.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>假设做无限次的光的弹射，那么最后会收敛到某一个亮度，之后就不会再出现剧烈的变化，会基本保持在某个亮度。（能量守恒和单位时间问题）</p>
+<h2 id="概率论基础"><a href="#概率论基础" class="headerlink" title="概率论基础"></a>概率论基础</h2><p>x指随机变量，p指出现某个随机变量的概率<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025027.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>所有概率之和等于1<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025028.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>数学期望<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025029.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025030.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671050025131.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Unity/" class="print-no-link">#Unity</a>
+      
+        <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" class="print-no-link">#图形学</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）</div>
+      <div>http://example.com/2024/05/26/计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>莫予</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%94%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E7%A7%AF%E5%88%86%E4%B8%8E%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA%EF%BC%89/" title="计算机图形学GAMES101（十五）光线追踪（蒙特卡洛积分与路径追踪）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">计算机图形学GAMES101（十五）光线追踪（蒙特卡洛积分与路径追踪）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/" title="计算机图形学GAMES101（十三）光线追踪（加速结构）">
+                        <span class="hidden-mobile">计算机图形学GAMES101（十三）光线追踪（加速结构）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+    
+        <div class="footer-content">
+             <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid | 苟活于互联网边缘</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+        </div>
+        
+            
+                <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        ✨一共戳了 
+        <span id="leancloud-site-pv"></span>
+         次 |
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        ❤你是第 
+        <span id="leancloud-site-uv"></span>
+         枚看到我的
+      </span>
+    
+    
+
+  
+</div>
+
+                    
+                        
+                                    
+</div>
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/DynamicRibbon.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/love.min.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/kasumi_event128.model.json"},"display":{"superSample":2,"width":200,"height":400,"position":"left","hOffset":20,"vOffset":0},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"dialog":{"enable":true,"text":["pop，pipapipa~","这里不可以","星星在天上而你在我心里ヾ(≧▽≦*)o"]},"log":false});</script></body>
+</html>

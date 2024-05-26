@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/myTitleIcon.png">
+  <link rel="icon" href="/img/myTitleIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="莫予">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本节内容：  重心坐标 纹理的应用  重心坐标（Barycentric Coordinates）重心坐标就是为了解决在三角形内部做插值的问题。（插值就是从一个顶点的颜色平滑的过度到另一个顶点的颜色） 重心坐标的含义重心坐标是定义在一个三角形上的，在三角形ABC中的任何一个点（x，y）都可以表示成三角形的顶点ABC的线性组合，并且需要满足α+β+γ&#x3D;1（等于1时是在三角形所在的平面内，不等">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学GAMES101（八）着色（插值、高级纹理映射）">
+<meta property="og:url" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/index.html">
+<meta property="og:site_name" content="莫予的人间大宝藏">
+<meta property="og:description" content="本节内容：  重心坐标 纹理的应用  重心坐标（Barycentric Coordinates）重心坐标就是为了解决在三角形内部做插值的问题。（插值就是从一个顶点的颜色平滑的过度到另一个顶点的颜色） 重心坐标的含义重心坐标是定义在一个三角形上的，在三角形ABC中的任何一个点（x，y）都可以表示成三角形的顶点ABC的线性组合，并且需要满足α+β+γ&#x3D;1（等于1时是在三角形所在的平面内，不等">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023731.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023732.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023733.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023734.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023745.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023746.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023747.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023748.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_16,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_17,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/43e68859697a40e18c5a8ae286061bd7.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023759.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237510.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237511.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237512.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237513.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237514.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237515.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237616.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237617.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237618.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237619.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237620.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237621.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237622.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_17,color_FFFFFF,t_70,g_se,x_16-171670990237623.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_17,color_FFFFFF,t_70,g_se,x_16-171670990237624.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_11,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237725.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_10,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="article:published_time" content="2024-05-26T07:51:14.000Z">
+<meta property="article:modified_time" content="2024-05-26T07:52:22.199Z">
+<meta property="article:author" content="莫予">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="图形学">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+  
+  
+  
+  <title>计算机图形学GAMES101（八）着色（插值、高级纹理映射） - 莫予的人间大宝藏</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/scroll.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":55,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"F9Y5mCKv9ARqmAKZyYohD39E-gzGzoHsz","app_key":"SAkoCxXOO3Ug37vyt1y7vT2Z","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>莫予&#39;Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="计算机图形学GAMES101（八）着色（插值、高级纹理映射）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-26 15:51" pubdate>
+          2024年5月26日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          20 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">计算机图形学GAMES101（八）着色（插值、高级纹理映射）</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    本文最后更新于 2024年5月26日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本节内容：</p>
+<ul>
+<li>重心坐标</li>
+<li>纹理的应用</li>
+</ul>
+<h2 id="重心坐标（Barycentric-Coordinates）"><a href="#重心坐标（Barycentric-Coordinates）" class="headerlink" title="重心坐标（Barycentric Coordinates）"></a>重心坐标（Barycentric Coordinates）</h2><p>重心坐标就是为了解决在三角形内部做插值的问题。（插值就是从一个顶点的颜色平滑的过度到另一个顶点的颜色）</p>
+<h2 id="重心坐标的含义"><a href="#重心坐标的含义" class="headerlink" title="重心坐标的含义"></a>重心坐标的含义</h2><p>重心坐标是定义在一个三角形上的，在三角形ABC中的任何一个点（x，y）都可以表示成三角形的顶点ABC的线性组合，并且需要满足α+β+γ&#x3D;1（等于1时是在三角形所在的平面内，不等于1则不在平面内）。这样就可以用（α，β，γ）来表示一个点了。如果α，β，γ都为非负数，则表示这个点在三角形内部<br>这样用的好处：<br>只要知道三个顶点，就可以表示三角形内部任意一个点的位置了<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>顶点自己的坐标：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023731.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>可知A点自己的重心坐标是（1，0，0）</p>
+<h2 id="怎么求重心坐标"><a href="#怎么求重心坐标" class="headerlink" title="怎么求重心坐标"></a>怎么求重心坐标</h2><p>方式一：<br>α的值是和A点不相邻的三角形的面积除以总面积<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023732.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="三角形的重心"><a href="#三角形的重心" class="headerlink" title="三角形的重心"></a>三角形的重心</h2><p>三角形的重心把大三角形均匀的分为了三份，所以三角形重心的重心坐标为（1&#x2F;3,1&#x2F;3,1&#x2F;3）<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023733.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="怎么求重心坐标-1"><a href="#怎么求重心坐标-1" class="headerlink" title="怎么求重心坐标"></a>怎么求重心坐标</h2><p>方式二：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023734.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="利用重心坐标来做插值"><a href="#利用重心坐标来做插值" class="headerlink" title="利用重心坐标来做插值"></a>利用重心坐标来做插值</h2><p>直接用属性乘以重心坐标就可以求出三角形内部任意一点插值的结果。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023745.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="怎么应用纹理"><a href="#怎么应用纹理" class="headerlink" title="怎么应用纹理"></a>怎么应用纹理</h2><p>屏幕上任何一个采样点都有一个位置，就可以知道在这个位置上插值出来的uv（纹理坐标）。原来的纹理坐标都定义在三角形的顶点上现在对于任何一个三角形内的点，我们都知道其在三角形中的位置，然后用重心坐标做一个插值，可以算出这一个点的uv。<br>然后去纹理上查询一些uv的值就可以得到对应的纹理，（可以用来当作漫反射系数K<del>d</del>）<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023746.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br> 那么这样应用纹理会带来什么问题</p>
+<h2 id="问题1：分辨率高纹理小"><a href="#问题1：分辨率高纹理小" class="headerlink" title="问题1：分辨率高纹理小"></a>问题1：分辨率高纹理小</h2><p>如果分辨率高（假如是4K），而纹理小（假如是256P），那么在任意一个点上去查纹理，可能会查到一些非整数的值。这样就会造成纹理被拉大</p>
+<p>对应屏幕上任意一个点都可以在纹理上找到一个相应的位置，如果不是整数则采用四舍五入，这样会造成在不同像素上应用的其实是同一个纹理，即图Nearest</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023747.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>为了解决用非整数坐标在查询纹理时怎么得到纹理对应得值，引入双线性插值</p>
+<p>可以看到此时红色得点并没有落在纹理的任何一个位置上，而是一个非整数的位置，如果采用四舍五入的方法那么落在一个纹理在周围的正方形里面的像素都会显示用一个颜色，这显然是不对的</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023748.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>双线性插值的做法：<br>首先找到像素临近四个的四个纹理点<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_16,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后计算红点离左下角u<del>00</del>这个点的水平距离s和插值距离t，s、t都是位于0~1之间（两个纹理像素之间相差1）<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_17,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后进行线性插值lerp</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/43e68859697a40e18c5a8ae286061bd7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>其中v<del>0</del>和v<del>1</del>是两个不同的点，当x&#x3D;0时lerp的值就是v<del>0</del>，当x&#x3D;1时lerp的值就是v<del>1</del>，当x位于0到1之间时lerp的值就是位于v<del>0</del>到v<del>1</del>之间</p>
+<p>这样我们就可以利用 距离s 以及 左下角 和 右下角 的点做一个线性插值来就出u<del>0</del>的颜色，u<del>1</del>同理<img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167099023759.png" srcset="/img/loading.gif" lazyload><br>然后利用距离t 再对u<del>0</del>，u<del>1</del>做一次插值，这样就求出了红点的颜色了。其颜色取决于周围四个纹理像素的颜色。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237510.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>双线性插值后的效果：Bilinear<img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237511.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="比双线性插值更高明的方法——双三次插值Bicubic"><a href="#比双线性插值更高明的方法——双三次插值Bicubic" class="headerlink" title="比双线性插值更高明的方法——双三次插值Bicubic"></a>比双线性插值更高明的方法——双三次插值Bicubic</h2><p>这种操作取的是周围16个像素而非4个像素，然后用这16个像素做水平和竖直方向的插值，不过是每次用4个做三次插值。</p>
+<h2 id="问题2：分辨率低纹理大"><a href="#问题2：分辨率低纹理大" class="headerlink" title="问题2：分辨率低纹理大"></a>问题2：分辨率低纹理大</h2><p>当分辨率低而纹理分辨率高时会出现摩尔纹。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237512.png" srcset="/img/loading.gif" lazyload><br>摩尔纹出现的原因<br>分辨率低就会造成一个像素会覆盖多个纹理。</p>
+<p>在近处时一个像素覆盖纹理上的区域相对交小<br>在远处时一个像素覆盖纹理上的区域相对交大</p>
+<p>当像素覆盖的纹理区域大时就不知道应该应用哪个纹理了，就会造成摩尔纹（走样）<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237513.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>可以看到图片上有很多锯齿，那么肯定也可以用抗锯齿的方法</p>
+<p>解决方法：<br>使用超采样技术后MSAA的效果：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237514.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>但是花费太高了</p>
+<p>更好的解决方法：<br>点查询：有一个点，然后去纹理上面查找相应的纹理，这是点查询<br>范围查询：不做采样，拿到一个区域立刻可以得到其内部的平均值，这是范围查询（范围查询可以查范围的最大值、最小值、平均值等等）</p>
+<p>我们只要知道纹理上一块区域的平均值，然后使用这个平均值当作该像素的颜色就行了<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237515.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="MipMap"><a href="#MipMap" class="headerlink" title="MipMap"></a>MipMap</h2><p>怎么得到一个范围的值呢？<br>使用MipMap<br>特点：速度快、不一定准确（近似值）、只能查询正方形范围</p>
+<p>MipMap的含义：<br>当我们拿到原始纹理（level 0）时，先把这些MipMap都生成。即每次图片分辨率都缩小一半，直到1*1<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237616.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>将这些图叠加到一起：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237617.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>因为每一层图分辨率都缩小一半，所以每一层的存储量都是上一层的四分之一，总开销&#x3D;1+1&#x2F;4+1&#x2F;16+……   计算得总开销是4&#x2F;3，额外开销仅仅是1&#x2F;3。</p>
+<p>任何一个像素都可以映射到一个纹理上的区域，要计算这个区域有多大，首先要把其周围的像素也投影上去<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237618.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>已知一个像素在屏幕空间上距离是1，那么就可计算出投影到纹理上的距离L，那么我们就可以计算出一个像素在纹理上占据的面积了。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237619.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>红色部分是映射到纹理上的实际区域，正方形是近似区域。<br>得到这个正方形后就可以根据正方形边长L去查找哪一张图片，从而得到改正方形区域颜色的平均值。<br>当正方形是1<em>1时即L&#x3D;1， 则log<del>2</del>L&#x3D;0，表示可以在原始纹理上找到其对应像素，像素的值就是该区域的平均值<br>当正方形是2</em>2时即L&#x3D;2， 则log<del>2</del>L&#x3D;1，表示在level 1上对应一个像素，像素的值就是该区域的平均值</p>
+<p>边长为L则到log<del>2</del>L层去查找像素。</p>
+<p>下面是不同位置的查询层数，同颜色代表在同一层<img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237620.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>怎么解决查询第1.5层呢？<br>使用插值的方法就行</p>
+<p>首先找到第一层，然后找D+1层，这两层内部使用双线性插值求出每一层内部的值，然后将求得的两个插值结果在层与层之间再做一次插值。所以一共做了三步，这叫做三线性插值。这就得到了1.5层<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237621.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>结果三线性插值后查询层数的结果<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237622.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>使用MipMap之后的图：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_17,color_FFFFFF,t_70,g_se,x_16-171670990237623.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>可以看到相比MSAA 远处是糊的，因为其只能查询正方形区域的平均值，如果不是正方形就会产生误差，而且插值也会带来误差，误差叠加之下就糊了。</p>
+<p>各向异性过滤（Anisotropic Filtering ） ：在不同的方向上的表现并不相同（考虑不同的方向），是用来过滤、处理当视角变化导致3D物体表面倾斜时造成的纹理错误。</p>
+<p>各向同性过滤 ：在不同的方向上的表现相同（不考虑方向）</p>
+<p>在MipMap的基础上进行各向异性过滤：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_17,color_FFFFFF,t_70,g_se,x_16-171670990237624.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>MipMap所作的工作其实是计算主对角线上的图片，横向压缩和竖向压缩MipMap是没有做的，所以MipMap只能查询正方形区域。</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_11,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload><br>而各向异性过滤做了横向压缩和竖向压缩，所以可以查询矩形区域了，实际中的图片会各种形状，矩形区域更加精准但是仍然不完全准确。其开销是原来三倍<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670990237725.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>为了解决不能查询不规则的图形问题有一个新方法</p>
+<h2 id="EWA"><a href="#EWA" class="headerlink" title="EWA"></a>EWA</h2><p>EWA滤波被广泛的认为是纹理过滤（texture filtering)算法中最好的算法之一。对于任何一个形状，都可以拆成很多不同的圆形去覆盖这个形状。如上图查询一个椭圆，将其拆成三个圆形，每次去查询一个圆形，多次查询自然就可以得到一个区域，但是代价是“多次查询”。可见质量越高的效果，性能开销越大。</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%85%AB%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E6%8F%92%E5%80%BC%E3%80%81%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_10,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>各向异性过滤主要靠显存，打游戏现存大可以开。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Unity/" class="print-no-link">#Unity</a>
+      
+        <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" class="print-no-link">#图形学</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>计算机图形学GAMES101（八）着色（插值、高级纹理映射）</div>
+      <div>http://example.com/2024/05/26/计算机图形学GAMES101（八）着色（插值、高级纹理映射）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>莫予</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B9%9D%EF%BC%89%E5%87%A0%E4%BD%95%EF%BC%88%E5%9F%BA%E6%9C%AC%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95%EF%BC%89/" title="计算机图形学GAMES101（九）几何（基本表示方法）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">计算机图形学GAMES101（九）几何（基本表示方法）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%83%EF%BC%89%E7%9D%80%E8%89%B2%EF%BC%88%E7%9D%80%E8%89%B2%E9%A2%91%E7%8E%87%E3%80%81%E5%9B%BE%E5%BD%A2%E7%AE%A1%E7%BA%BF%E3%80%81%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%EF%BC%89/" title="计算机图形学GAMES101（七）着色（着色频率、图形管线、纹理映射）">
+                        <span class="hidden-mobile">计算机图形学GAMES101（七）着色（着色频率、图形管线、纹理映射）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+    
+        <div class="footer-content">
+             <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid | 苟活于互联网边缘</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+        </div>
+        
+            
+                <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        ✨一共戳了 
+        <span id="leancloud-site-pv"></span>
+         次 |
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        ❤你是第 
+        <span id="leancloud-site-uv"></span>
+         枚看到我的
+      </span>
+    
+    
+
+  
+</div>
+
+                    
+                        
+                                    
+</div>
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/DynamicRibbon.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/love.min.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/kasumi_event128.model.json"},"display":{"superSample":2,"width":200,"height":400,"position":"left","hOffset":20,"vOffset":0},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"dialog":{"enable":true,"text":["pop，pipapipa~","这里不可以","星星在天上而你在我心里ヾ(≧▽≦*)o"]},"log":false});</script></body>
+</html>

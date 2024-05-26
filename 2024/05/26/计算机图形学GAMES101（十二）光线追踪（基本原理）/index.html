@@ -1,0 +1,787 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/myTitleIcon.png">
+  <link rel="icon" href="/img/myTitleIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="莫予">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="我们是怎么解决阴影问题？当对物体着色的时候，只考虑了像素点自己，没有考虑物体遮挡。所以着色不能解决阴影。那么怎么解决阴影问题呢？ 阴影映射（Shadow mapping）可以使用阴影映射来渲染阴影。阴影映射的实质还是光栅化。阴影映射的思想：如果一个点不在阴影里，则我们可以看到这个点，而且相对于光源来说也可以看到这个点。如果一个点在阴影里，则我们可以看到这个点，但是相对于光源来说也看不到这个点。即一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学GAMES101（十二）光线追踪（基本原理）">
+<meta property="og:url" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/index.html">
+<meta property="og:site_name" content="莫予的人间大宝藏">
+<meta property="og:description" content="我们是怎么解决阴影问题？当对物体着色的时候，只考虑了像素点自己，没有考虑物体遮挡。所以着色不能解决阴影。那么怎么解决阴影问题呢？ 阴影映射（Shadow mapping）可以使用阴影映射来渲染阴影。阴影映射的实质还是光栅化。阴影映射的思想：如果一个点不在阴影里，则我们可以看到这个点，而且相对于光源来说也可以看到这个点。如果一个点在阴影里，则我们可以看到这个点，但是相对于光源来说也看不到这个点。即一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285921.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285922.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285923.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285934.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_17,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_10,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/e5ea5f8b92ea4108ad98e60207f1f11d.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_18,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285935.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285936.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285947.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285948.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285949.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859410.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859411.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859412.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859413.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859514.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_11,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_16,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859515.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859516.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859517.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859518.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_19,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859619.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859620.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859621.png">
+<meta property="article:published_time" content="2024-05-26T07:58:07.000Z">
+<meta property="article:modified_time" content="2024-05-26T07:59:26.707Z">
+<meta property="article:author" content="莫予">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="图形学">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+  
+  
+  
+  <title>计算机图形学GAMES101（十二）光线追踪（基本原理） - 莫予的人间大宝藏</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/scroll.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":55,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"F9Y5mCKv9ARqmAKZyYohD39E-gzGzoHsz","app_key":"SAkoCxXOO3Ug37vyt1y7vT2Z","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>莫予&#39;Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="计算机图形学GAMES101（十二）光线追踪（基本原理）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-26 15:58" pubdate>
+          2024年5月26日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          23 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">计算机图形学GAMES101（十二）光线追踪（基本原理）</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    本文最后更新于 2024年5月26日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="我们是怎么解决阴影问题？"><a href="#我们是怎么解决阴影问题？" class="headerlink" title="我们是怎么解决阴影问题？"></a>我们是怎么解决阴影问题？</h2><p>当对物体着色的时候，只考虑了像素点自己，没有考虑物体遮挡。所以着色不能解决阴影。那么怎么解决阴影问题呢？</p>
+<h2 id="阴影映射（Shadow-mapping）"><a href="#阴影映射（Shadow-mapping）" class="headerlink" title="阴影映射（Shadow mapping）"></a>阴影映射（Shadow mapping）</h2><p>可以使用阴影映射来渲染阴影。阴影映射的实质还是光栅化。<br>阴影映射的思想：<br>如果一个点不在阴影里，则我们可以看到这个点，而且相对于光源来说也可以看到这个点。如果一个点在阴影里，则我们可以看到这个点，但是相对于光源来说也看不到这个点。即一个点不在阴影里面则两者都可以看到。（这种阴影叫做硬阴影）</p>
+<p>实现阴影映射的步骤：<br>1、从光源看向场景记录看到的深度信息。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2、从摄像机看向这个场景也会得到一个深度信息，然后将两个深度学习进行比较，如果同一个点的两个深度信息是一致的则说明这个点不在阴影内。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285921.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>如果一个点的两个深度信息不一致，说明这个点光源看不到，这点在阴影里面。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285922.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="Shadow-mapping的实际过程"><a href="#Shadow-mapping的实际过程" class="headerlink" title="Shadow mapping的实际过程"></a>Shadow mapping的实际过程</h2><p>从光源看过去看到的场景如下<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285923.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>记录深度信息（Shadow mapping）<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285934.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后从摄像机的出发的得到下面这张图<br>对于这张图，每一个像素对于的实际位置都投影回光源生成的Shadow mapping上，然后对比在Shadow mapping上的深度信息和实际的深度信息，如果是一样的则说明不在阴影里，不一样说明在阴影里。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_17,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>阴影质量：通常指Shadow mapping的分辨率的高低</p>
+<p>硬阴影：阴影的边缘非常锐利<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_10,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>软阴影：阴影的边缘呈现一种过渡状态（越靠近物体则阴影越硬，离物体越远阴影越软）<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/e5ea5f8b92ea4108ad98e60207f1f11d.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>Umbra:本影<br>Penumbra：半影<br>软阴影就是本影和半影的结合。<br>对于点光源是不会有软阴影的，有软阴影则说明光源有大小。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_18,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="为什么要用光线追踪（Ray-tracing）？"><a href="#为什么要用光线追踪（Ray-tracing）？" class="headerlink" title="为什么要用光线追踪（Ray tracing）？"></a>为什么要用光线追踪（Ray tracing）？</h2><p>光栅化不能很好的解决全局效果。<br>一个是对于软阴影光栅化不能很好的解决，另一个是当光线不只反射一次时也很难解决</p>
+<p>用光栅化或者光线追踪渲染阴影的优缺点：<br>光栅化速度很快，但是质量较低。<br>光线追踪光照效果很精确，但是速度慢</p>
+<h2 id="关于光线的定义"><a href="#关于光线的定义" class="headerlink" title="关于光线的定义"></a>关于光线的定义</h2><p>1、光线是沿着直线传播的<br>2、光线交叉不会发送碰撞<br>3、光线是从光源出发到达人眼的，而且光路是可以反转的（从人眼到光源）这叫做光线的可逆性</p>
+<p>光线追踪利用的就是光线的可逆性，从摄像机出发，对于每一个像素发射光线，然后光线会打到场景中某一个位置，然后将这个位置作为起点和光源连起来，如果连线没有被物体遮挡则说明光源也可以照到这个位置，这就找到了一条有效的光路。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285935.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>实现光线最终的具体过程：<br>首先发射光线求得光线和场景最近的交汇点。</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285936.png" srcset="/img/loading.gif" lazyload><br>然后将这个交汇点作为起点和光源连起来，如果连线没有被物体遮挡则说明光源也可以照到这个位置。进行着色以后就只要写回到像素点即可。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285947.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>但在这样计算出来的光线仍然只能模拟光线反射一次，没办法模拟多次弹射</p>
+<h2 id="Whitted-Style光线追踪"><a href="#Whitted-Style光线追踪" class="headerlink" title="Whitted-Style光线追踪"></a>Whitted-Style光线追踪</h2><p>Whitted-Style光线追踪的实现步骤：<br>1、从摄像机出发，对每个像素发射光线<br>Whitted-Style光线追踪就是在任意一个点可以继续传播光线，只需要我们计算出来折射方向即可<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285948.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2、然后对每个发射了弹射的点都和光源连一条线，计算是否可以被光源照亮。然后对这些点进行着色，并且将所有的着色结果加到该像素上面。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167103285949.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>对于不同的光线的定义：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859410.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="怎么求光线和物体的交汇点"><a href="#怎么求光线和物体的交汇点" class="headerlink" title="怎么求光线和物体的交汇点"></a>怎么求光线和物体的交汇点</h2><p>光线在数学上的定义<br>光线上的任何一个点都可以用 r(t)&#x3D;0+td 表示,其中的t表示光线传播的时间，td表示光线沿着这个方向传播的距离<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859411.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>接下来就要求光线和物体的交汇点了，球的方程是  p：（p-c）^2^-R^2^&#x3D;0。如果两者相交，则说明p点即在光线上又在球上。所以只需要将光线的方程带入球的方程即可。即(0+td-c)^2^-R^2^&#x3D;0<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859412.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>怎么求t<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859413.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>求光线和一般性的隐式表面的焦点<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859514.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="求光线和显式表面的焦点"><a href="#求光线和显式表面的焦点" class="headerlink" title="求光线和显式表面的焦点"></a>求光线和显式表面的焦点</h2><p>因为模型都是由很多个三角形组成的，要求光线和一个显示表面的焦点只需要把表面上所有三角形和光线的焦点求出来即可。所以求光线和显式表面的焦点主要解决光线和三角形的焦点问题</p>
+<p>通过光线和三角形求焦点还可以判断某一个点是在物体内还是外面。</p>
+<p>假如有一个正方体，在正方体内部的点朝一个方向发射一条光线（射线），发现光线和正方体的焦点是奇数个。在正方体外部的点朝正方体发射一条光线，发现光线和正方体的焦点是偶数个。如下图<img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_11,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="怎么求光线和三角形的焦点"><a href="#怎么求光线和三角形的焦点" class="headerlink" title="怎么求光线和三角形的焦点"></a>怎么求光线和三角形的焦点</h2><p>步骤：<br>1、首先求光线和三角形所在平面的焦点<br>2、判断这个焦点是否在三角形内<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_16,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="平面的定义"><a href="#平面的定义" class="headerlink" title="平面的定义"></a>平面的定义</h2><p>平面上的任何一个点p都可以表示为（p-p’）点乘 N&#x3D; 0，因为N是平面的法向量所以平面内的任何一条线都和N垂直，p-p’就表示以p‘作为起点p为终点的一条线。该平面的一般方程为ax+by+cz+d&#x3D;0<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859515.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>要求光线和平面的焦点，说明这个点即在平面上又在光线上。所以只需要将光线方程代入平面方程即可。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859516.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>接下来只需要判断点是否在三角形内即可。判断点是否在三角形内位于 计算机图形学GAMES101（一）。</p>
+<h2 id="Moller-Trumbore-Algorithm"><a href="#Moller-Trumbore-Algorithm" class="headerlink" title="Möller Trumbore Algorithm"></a>Möller Trumbore Algorithm</h2><p>上述的方法，首先要求光线和平面的焦点然后还要求点和三角形的位置关系，太麻烦了。</p>
+<p>新方法：MT方法可以直接求光线和三角形的焦点</p>
+<p>（1-b<del>1</del>-b<del>2</del>）$\vec P$<del>0</del>+b<del>1</del>$\vec P$<del>1</del>+b<del>2</del>$\vec P$<del>2</del>表示在三角形内部的点，$\vec O$+t$\vec D$表示光线上的点，它们的焦点肯定是同时满足这两个方程的，所以只需要将这两个方程联立起来即可。<br>这样就只有t、b<del>1</del>、b<del>2</del>是未知数了，求解的过程如下图。</p>
+<p>（重心坐标相关知识位于计算机图形学GAMES101（八））<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859517.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>一个场景里面有很多物体，一个物体的又是由很多三角形组成的，光线和物体所有的三角形求焦点太慢了，需要一个方法来加速这个过程。</p>
+<h2 id="包围盒（Bounding-Volumes）"><a href="#包围盒（Bounding-Volumes）" class="headerlink" title="包围盒（Bounding Volumes）"></a>包围盒（Bounding Volumes）</h2><p>有一个复杂的物体，我们可以用一个相对简单的形状包起来，这个形状叫做包围盒。如果一束光线跟包围盒都没有焦点，那么跟包围盒里面的物体就更不可能有焦点了。这样就减少了计算量。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859518.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>对于三维物体一般用长方体来当作包围盒。一个长方体可以理解为是三个不同的对立面形成的交集。</p>
+<p>为什么要这么理解？</p>
+<p>因为平常使用的包围盒叫做轴对齐包围盒（Axis-Aligned Bounding Box）缩写：AABB。这个长方体的任意一条边都和某一条轴（x、y、z轴）是平行的。在二维平面上就是对于一个长方形，这个长方形的边都是和轴对齐的。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_19,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="二维平面上光线和包围盒求焦点"><a href="#二维平面上光线和包围盒求焦点" class="headerlink" title="二维平面上光线和包围盒求焦点"></a>二维平面上光线和包围盒求焦点</h2><p>在二维情况下，包围盒的两个对立面就变为了两条竖线。我们只需要算出光线什么时候和X<del>0</del>相交，什么时候和X<del>1</del>相交，就可以算出光线在x方向和包围盒相交的点了。在t<del>min</del>时刻进入了包围盒的对立面，在t<del>max</del>时刻离开包围盒的对立面。（如下面左图）</p>
+<p>光线与y方向的判断同理（如下面中图）。</p>
+<p>刚刚分别得到了x方向和y方向的进入、离开时刻，那么如何得到光线进入、离开整个盒子的时刻呢？</p>
+<p>只需要求两端线段的交集（如下面右图）<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859619.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="三维平面上光线和包围盒求焦点"><a href="#三维平面上光线和包围盒求焦点" class="headerlink" title="三维平面上光线和包围盒求焦点"></a>三维平面上光线和包围盒求焦点</h2><p>三维情况下一个包围盒有三个对立面。</p>
+<p>光线进入所有对面（三个对面）的时候，才可以说明光线进入这个盒子，而当光线离开任意一个对面的时候，就可以说明光线离开了这个盒子。</p>
+<p>对于一个三维的包围盒，有三个不同的对立面，各计算一次光线进入对立面的最小时间t<del>min</del>和最大时间t<del>max</del>。由于光线进入所有对面（三个对面）的时候，才可以说明光线进入这个盒子，那么计算出光线进入盒子的时间就是t<del>min</del>中最大的，即为t<del>enter</del>，也就是光线最晚进入的那一组对面的时间。同理，由于光线离开一个对面的时候，就可以判定光线离开这个盒子，那么光线离开离开这个盒子就是t<del>max</del>中最小的，也就是光线最早离开的那一组对面的时间，即为t<del>exit</del>。</p>
+<p>这样就得到了光线什么时候进入的盒子以及什么时候离开的盒子。</p>
+<p>如果进入的时间小于离开的时间，即t<del>enter</del>&lt;t<del>exit</del>说明这段时间光线就在盒子里，说明光线和盒子有焦点。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859620.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>接下来考虑时间t的正负</p>
+<ul>
+<li>如果离开盒子的时间为负，则说明光线在盒子后面，无交点。</li>
+<li>如果离开盒子的时间为正，而进入盒子的时间为负，则说明光线的起点就在这个盒子里面。一定有交点。</li>
+</ul>
+<p> 总结：<br> 当且仅当进入时间小于离开时间且离开时间非负，则证明有交点。</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671032859621.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Unity/" class="print-no-link">#Unity</a>
+      
+        <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" class="print-no-link">#图形学</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>计算机图形学GAMES101（十二）光线追踪（基本原理）</div>
+      <div>http://example.com/2024/05/26/计算机图形学GAMES101（十二）光线追踪（基本原理）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>莫予</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/" title="计算机图形学GAMES101（十三）光线追踪（加速结构）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">计算机图形学GAMES101（十三）光线追踪（加速结构）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%80%EF%BC%89%E5%87%A0%E4%BD%95%EF%BC%88%E7%BD%91%E6%A0%BC%E5%A4%84%E7%90%86%EF%BC%89/" title="计算机图形学GAMES101（十一）几何（网格处理）">
+                        <span class="hidden-mobile">计算机图形学GAMES101（十一）几何（网格处理）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+    
+        <div class="footer-content">
+             <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid | 苟活于互联网边缘</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+        </div>
+        
+            
+                <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        ✨一共戳了 
+        <span id="leancloud-site-pv"></span>
+         次 |
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        ❤你是第 
+        <span id="leancloud-site-uv"></span>
+         枚看到我的
+      </span>
+    
+    
+
+  
+</div>
+
+                    
+                        
+                                    
+</div>
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/DynamicRibbon.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/love.min.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/kasumi_event128.model.json"},"display":{"superSample":2,"width":200,"height":400,"position":"left","hOffset":20,"vOffset":0},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"dialog":{"enable":true,"text":["pop，pipapipa~","这里不可以","星星在天上而你在我心里ヾ(≧▽≦*)o"]},"log":false});</script></body>
+</html>

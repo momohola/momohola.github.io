@@ -1,0 +1,759 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/myTitleIcon.png">
+  <link rel="icon" href="/img/myTitleIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="莫予">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="补充内容Rθ是逆时针方向旋转的矩阵R-θ是顺时针方向旋转的矩阵可以发现Rθ^T^&#x3D;Rθ^-1^	，像这样的矩阵叫做正交矩阵。以后如果要求往相反的方向旋转相同角度的变换（R-θ），只需要求正向旋转的矩阵然后转置就可以了 本节涉及内容： 仿射变换：线性变换+平移 三维空间中的变换矩阵格式： 3D旋转任意一个旋转都可以被分解为绕着X，Y，Z轴的旋转 即：α β γ这三个角叫做欧拉角（Euler">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学GAMES101（三）变换（模型、视图、投影）">
+<meta property="og:url" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/index.html">
+<meta property="og:site_name" content="莫予的人间大宝藏">
+<meta property="og:description" content="补充内容Rθ是逆时针方向旋转的矩阵R-θ是顺时针方向旋转的矩阵可以发现Rθ^T^&#x3D;Rθ^-1^	，像这样的矩阵叫做正交矩阵。以后如果要求往相反的方向旋转相同角度的变换（R-θ），只需要求正向旋转的矩阵然后转置就可以了 本节涉及内容： 仿射变换：线性变换+平移 三维空间中的变换矩阵格式： 3D旋转任意一个旋转都可以被分解为绕着X，Y，Z轴的旋转 即：α β γ这三个角叫做欧拉角（Euler">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197891.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197892.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197903.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197904.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/0ce4e7732b974ea0a60b760ff8df4830.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197915.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197916.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197917.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_10,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_11,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/dc9b1ca5f14044309121c95cc9b09ca4.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/b2042e8ab67f4caaa2ddde29d7614c77.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/a5e34b25598c4c76bbc2ba9cb2b5b32f.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/dbe2c59ffda84b1697fe71466ce6a100.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/4dde96c20b23476eaefa62ba15259c6b.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197938.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197939.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979410.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979411.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979412.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979413.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/96ccadac9d6b43a38244cfde850193f3.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979514.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979515.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/cbde2991300845f69d4060f55c178ef3.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/59d102dfe74740daaf66a8d86a7152e6.png">
+<meta property="article:published_time" content="2024-05-26T07:41:32.000Z">
+<meta property="article:modified_time" content="2024-05-26T07:42:32.669Z">
+<meta property="article:author" content="莫予">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="图形学">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+  
+  
+  
+  <title>计算机图形学GAMES101（三）变换（模型、视图、投影） - 莫予的人间大宝藏</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/scroll.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":55,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"F9Y5mCKv9ARqmAKZyYohD39E-gzGzoHsz","app_key":"SAkoCxXOO3Ug37vyt1y7vT2Z","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>莫予&#39;Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="计算机图形学GAMES101（三）变换（模型、视图、投影）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-26 15:41" pubdate>
+          2024年5月26日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">计算机图形学GAMES101（三）变换（模型、视图、投影）</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    本文最后更新于 2024年5月26日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="补充内容"><a href="#补充内容" class="headerlink" title="补充内容"></a>补充内容</h2><p>R<del>θ</del>是逆时针方向旋转的矩阵<br>R<del>-θ</del>是顺时针方向旋转的矩阵<br>可以发现R<del>θ</del>^T^&#x3D;R<del>θ</del>^-1^	，像这样的矩阵叫做正交矩阵。以后如果要求往相反的方向旋转相同角度的变换（R<del>-θ</del>），只需要求正向旋转的矩阵然后转置就可以了<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br> 本节涉及内容：<br> <img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197891.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>仿射变换：线性变换+平移</p>
+<p>三维空间中的变换矩阵格式：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197892.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197903.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197904.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3D旋转"><a href="#3D旋转" class="headerlink" title="3D旋转"></a>3D旋转</h2><p>任意一个旋转都可以被分解为绕着X，Y，Z轴的旋转 即：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/0ce4e7732b974ea0a60b760ff8df4830.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>α β γ这三个角叫做欧拉角（Euler angles）</p>
+<h2 id="罗德里格斯公式"><a href="#罗德里格斯公式" class="headerlink" title="罗德里格斯公式"></a>罗德里格斯公式</h2><p>该公式将解决了绕着任意方向的旋转<br>表示绕着向量n旋转α°可以使用下面这个公式。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197915.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>变换的最终目的是让三维空间的物体变为二维空间的一张照片。这样才能在电脑上面展示出来。</p>
+<h2 id="怎么理解模型、视图、投影变换"><a href="#怎么理解模型、视图、投影变换" class="headerlink" title="怎么理解模型、视图、投影变换"></a>怎么理解模型、视图、投影变换</h2><p>我们拍一张照片需要摆动作（模型变换）<br>动作摆好后，需要找一个好的拍摄角度（视图变换）<br>拍照  （投影变换，将三维物体投影到二维的平面上面）</p>
+<h2 id="怎么去定义视图变换"><a href="#怎么去定义视图变换" class="headerlink" title="怎么去定义视图变换"></a>怎么去定义视图变换</h2><p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197916.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>想要唯一的确定一个视角，首先需要定义相机在什么位置e（x，y，z），定义了相机的位置之后需要定义相机的朝向$\vec g$，确定朝向后相机仍可以绕着$\vec g$旋转，所以还需要一个$\vec t$来确定相机的向上方向，用来确定图片哪个方向是上方。</p>
+<p>如果摄像机和场景中所有的东西一起移动的话，那么整个场景在摄像机中的画面还是相对保持不变。<br>一般情况下相机的位置位于原点，相机永远朝向-Z方向，相机的向上方向为Y方向。<br>这样图形变换的时候视角不需要改变只改变物体的位置即可。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197917.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="现在需要将一个不在标准位置的视角变为标准位置"><a href="#现在需要将一个不在标准位置的视角变为标准位置" class="headerlink" title="现在需要将一个不在标准位置的视角变为标准位置"></a>现在需要将一个不在标准位置的视角变为标准位置</h2><p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_10,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>变为<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_11,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>那么我们需要做以下操作<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/dc9b1ca5f14044309121c95cc9b09ca4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>首先需要将视图位置e移到原点<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/b2042e8ab67f4caaa2ddde29d7614c77.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>考虑到要将g旋转到-Z，t旋转到Y，（g x t）旋转到X比较难，所以先求其逆变换，然后通过正交矩阵的性质求原矩阵（R^T^&#x3D;R^-1^）。<br>其逆变换就是<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/a5e34b25598c4c76bbc2ba9cb2b5b32f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/dbe2c59ffda84b1697fe71466ce6a100.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>利用R^T^&#x3D;R^-1^求得<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/4dde96c20b23476eaefa62ba15259c6b.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>至此就求出来视图变换得矩阵<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197938.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="投影"><a href="#投影" class="headerlink" title="投影"></a>投影</h2><p>正交投影：无论观看者在哪里，物体大小维持不变。没有近大远小，正交投影的视图是一个平面，所以物体大小不变，只是映射到一个平面上。<br>透视投影：近大远小，透视投影的视图是一个点，所以会改变物体大小，与我们日常习惯相符。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167093197939.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="正交投影"><a href="#正交投影" class="headerlink" title="正交投影"></a>正交投影</h2><p>计算机中正交投影对于一个物体的处理过程<br>我们要投影的立方体左（l） 右（r）是在x轴的值<br>我们要投影的立方体下（b）上（t）是在y轴的值<br>我们要投影的立方体远（f）近（n）是在z轴的值</p>
+<p>1、将物体中心点平移到原点<br>2、将其缩放成一个标准 1<em>1</em>1 的立方体<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979410.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>计算过程：<br>只需要乘以矩阵M<del>ortho</del>即可<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979411.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="透视投影"><a href="#透视投影" class="headerlink" title="透视投影"></a>透视投影</h2><p>步骤</p>
+<p>1、first “squish” the frustum into a cuboid (n-&gt;n,f-&gt;f)（M<del>persp-&gt;ottho</del>）<br>首先把“截锥”挤压成一个长方体(n-&gt;n,f-&gt;f)  得到矩阵M<del>persp-&gt;ottho</del><br>2、Do orthographic projection<br>做正交投影，即M<del>ortho</del>*M<del>persp-&gt;ottho</del><br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979412.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="怎么去挤压"><a href="#怎么去挤压" class="headerlink" title="怎么去挤压"></a>怎么去挤压</h2><p>挤压得实质就是求一个挤压矩阵M<del>persp-&gt;ottho</del><br>红色的两个三角形形成一对相似三角形<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979413.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>挤压x和y变为：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/96ccadac9d6b43a38244cfde850193f3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>使用齐次坐标表示并且写成矩阵乘法的形式<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979514.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>下面可以通过矩阵乘法反推出M<del>persp-&gt;ottho</del><br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171670931979515.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>M<del>persp-&gt;ottho</del>的最终结果：<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/cbde2991300845f69d4060f55c178ef3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>得到M<del>persp-&gt;ottho</del>后只要再做一次正交投影就可以完成透视投影了<br>M<del>persp</del>为透视投影的变换矩阵<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%B8%89%EF%BC%89%E5%8F%98%E6%8D%A2%EF%BC%88%E6%A8%A1%E5%9E%8B%E3%80%81%E8%A7%86%E5%9B%BE%E3%80%81%E6%8A%95%E5%BD%B1%EF%BC%89/59d102dfe74740daaf66a8d86a7152e6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Unity/" class="print-no-link">#Unity</a>
+      
+        <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" class="print-no-link">#图形学</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>计算机图形学GAMES101（三）变换（模型、视图、投影）</div>
+      <div>http://example.com/2024/05/26/计算机图形学GAMES101（三）变换（模型、视图、投影）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>莫予</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%9B%9B%EF%BC%89%E5%85%89%E6%A0%85%E5%8C%96%EF%BC%88%E4%B8%89%E8%A7%92%E5%BD%A2%E7%9A%84%E7%A6%BB%E6%95%A3%E5%8C%96%EF%BC%89/" title="计算机图形学GAMES101（四）光栅化（三角形的离散化）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">计算机图形学GAMES101（四）光栅化（三角形的离散化）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E4%BA%8C%EF%BC%89%E5%8F%98%E6%8D%A2/" title="计算机图形学GAMES101（二）变换">
+                        <span class="hidden-mobile">计算机图形学GAMES101（二）变换</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+    
+        <div class="footer-content">
+             <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid | 苟活于互联网边缘</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+        </div>
+        
+            
+                <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        ✨一共戳了 
+        <span id="leancloud-site-pv"></span>
+         次 |
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        ❤你是第 
+        <span id="leancloud-site-uv"></span>
+         枚看到我的
+      </span>
+    
+    
+
+  
+</div>
+
+                    
+                        
+                                    
+</div>
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/DynamicRibbon.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/love.min.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/kasumi_event128.model.json"},"display":{"superSample":2,"width":200,"height":400,"position":"left","hOffset":20,"vOffset":0},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"dialog":{"enable":true,"text":["pop，pipapipa~","这里不可以","星星在天上而你在我心里ヾ(≧▽≦*)o"]},"log":false});</script></body>
+</html>

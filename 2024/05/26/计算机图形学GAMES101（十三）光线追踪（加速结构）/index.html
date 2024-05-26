@@ -1,0 +1,767 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/myTitleIcon.png">
+  <link rel="icon" href="/img/myTitleIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="莫予">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="AABB是怎么加速光线追踪的 网格划分（Uniform grids） 空间划分（Spatial partitions）  网格划分（Uniform grids）1、找出包围盒2、划分网格3、找到有物体的格子假设光线和格子求交是很快的，和物体求交很慢 这个时候有一条光线穿过这个包围盒，光线穿过的格子为蓝色。当光线走到一个有物体的格子就说明光线可能和物体相交，这个时候就需要求光线和物体是否相交了。其中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学GAMES101（十三）光线追踪（加速结构）">
+<meta property="og:url" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/index.html">
+<meta property="og:site_name" content="莫予的人间大宝藏">
+<meta property="og:description" content="AABB是怎么加速光线追踪的 网格划分（Uniform grids） 空间划分（Spatial partitions）  网格划分（Uniform grids）1、找出包围盒2、划分网格3、找到有物体的格子假设光线和格子求交是很快的，和物体求交很慢 这个时候有一条光线穿过这个包围盒，光线穿过的格子为蓝色。当光线走到一个有物体的格子就说明光线可能和物体相交，这个时候就需要求光线和物体是否相交了。其中">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210391.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210392.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210403.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210404.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210405.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210406.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210407.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210408.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210419.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104110.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104111.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104112.png">
+<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104113.png">
+<meta property="article:published_time" content="2024-05-26T07:59:58.000Z">
+<meta property="article:modified_time" content="2024-05-26T08:00:42.700Z">
+<meta property="article:author" content="莫予">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="图形学">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+  
+  
+  
+  <title>计算机图形学GAMES101（十三）光线追踪（加速结构） - 莫予的人间大宝藏</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/scroll.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":55,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"F9Y5mCKv9ARqmAKZyYohD39E-gzGzoHsz","app_key":"SAkoCxXOO3Ug37vyt1y7vT2Z","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>莫予&#39;Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="计算机图形学GAMES101（十三）光线追踪（加速结构）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-26 15:59" pubdate>
+          2024年5月26日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">计算机图形学GAMES101（十三）光线追踪（加速结构）</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    本文最后更新于 2024年5月26日 下午
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="AABB是怎么加速光线追踪的"><a href="#AABB是怎么加速光线追踪的" class="headerlink" title="AABB是怎么加速光线追踪的"></a>AABB是怎么加速光线追踪的</h2><ul>
+<li>网格划分（Uniform grids）</li>
+<li>空间划分（Spatial partitions）</li>
+</ul>
+<h2 id="网格划分（Uniform-grids）"><a href="#网格划分（Uniform-grids）" class="headerlink" title="网格划分（Uniform grids）"></a>网格划分（Uniform grids）</h2><p>1、找出包围盒<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2、划分网格<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210391.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3、找到有物体的格子<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210392.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>假设光线和格子求交是很快的，和物体求交很慢</p>
+<p>这个时候有一条光线穿过这个包围盒，光线穿过的格子为蓝色。当光线走到一个有物体的格子就说明光线可能和物体相交，这个时候就需要求光线和物体是否相交了。其中深蓝色的格子就是光线和物体相交了。</p>
+<p>这样做就避免了执行很多次光线和物体求交，改为执行光线各格子求交。光线和格子求交是很快的，所以加速了光线追踪的速度。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210403.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="怎么划分格子的大小"><a href="#怎么划分格子的大小" class="headerlink" title="怎么划分格子的大小"></a>怎么划分格子的大小</h2><p>当格子太稀疏无法确定哪些地方没有物体，哪些地方有物体，这样就需要做很多次光线和物体的求交，则实际上没有太大效果。</p>
+<p>当格子太稠密，检测次数变多，效率也会降低</p>
+<p>应该划分的格子数量：<br>C：表示某一个常数<br>cells：表示格子的总数量<br>objs：表示物体数量</p>
+<p>C在三维平面里根据经验一般取值为 27<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210404.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="空间划分（Spatial-partitions）"><a href="#空间划分（Spatial-partitions）" class="headerlink" title="空间划分（Spatial partitions）"></a>空间划分（Spatial partitions）</h2><p>当场景中的物体分布比较均匀时，网格划分的效果很好<br>当场景中的物体分布不均匀时，网格划分的效果就不太行，那么就要用到空间划分了。</p>
+<p>一个真实的场景中经常有一大块的空白区域，这一大块空白其实可一用一个大格子来覆盖，而其他物体稠密的区域仍然用小格子。</p>
+<p>Oct-Tree：八叉树，对于三维空间中的一个场景将其横竖切三刀，切成八块，在二维空间表现为四叉。它的意思就是把包围盒切成四块，然后对于每一个子节点在切成四块，当格子是空的或者格子里面物体足够少时就停止。但是对于高维空间不好划分。</p>
+<p>KD-Tree：类似二叉树，每次将包围盒分成两份，每次都是沿着某个轴的方向进行分割，并且分割顺序是x-&gt;y-&gt;z -&gt;x-&gt;y-&gt;z……这样循环往复。</p>
+<p>BSP-Tree：也是每次划分选择一个方向将空间分成两部分，与KD-Tree相比它不是横平竖直的划分，不好计算。</p>
+<h2 id="KD-Tree"><a href="#KD-Tree" class="headerlink" title="KD-Tree"></a>KD-Tree</h2><p>在做光线追踪前需要把KD-Tree划分好然后进行光线追踪</p>
+<p>假设A是一个场景，全部在这个包围盒里。然后进行第一次垂直划分（蓝色和绿色）<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210405.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>接下来进行第二次横向划分（绿色和黄色）。蓝色部分实际上也要做划分，这里并不进行演示。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210406.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后在黄色部分进行垂直划分，最后再进行横向划分即可得到下面的图形。</p>
+<p>可以发现这样就得到了一颗二叉树，叶子节点存放格子的序号。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210407.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>建立好这个结构后就可以做光线追踪的加速了。</p>
+<h2 id="KD-Tree在实际中是怎么加速的"><a href="#KD-Tree在实际中是怎么加速的" class="headerlink" title="KD-Tree在实际中是怎么加速的"></a>KD-Tree在实际中是怎么加速的</h2><p>首先检查光线和场景中最大的包围盒A是否有交点<img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210408.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>如果有交点则检查光线和左子树是否有交点，当找到一个叶子节点时，那么就和该叶子节点里面的物体求交。（这里1号节点是叶子节点当到达这个节点，那么就要和这个节点里面的物体求交）</p>
+<p><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210419.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>接下来光线经过了2号区域那么需要和2号区域里面的物体求交，光线又经过了3号区域那么也要和3号区域里面的物体进行求交。t<del>hit</del>表示光线和最近的物体相交了。</p>
+<p>可以发现4号区域和5号区域光线没有经过，所以不要和里面的物体进行求交，加速了计算速度。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104110.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>KD-Tree也有很多缺点：</p>
+<ul>
+<li>对于有一个三角形构成的场景中，很难判定一个三角形和包围盒有交集</li>
+<li>一个包围盒被划分成了很多个小格子后，一个物体可能会在多个格子里，那么在这些格子都要保存这个物体，最后判断这个物体和光线是否相交也要执行很多次。</li>
+</ul>
+<h2 id="层次包围盒Bounding-Volume-Hierarchy（BVH）"><a href="#层次包围盒Bounding-Volume-Hierarchy（BVH）" class="headerlink" title="层次包围盒Bounding Volume Hierarchy（BVH）"></a>层次包围盒Bounding Volume Hierarchy（BVH）</h2><p>之前的方法都是按照空间来划分的，这个是按照物体划分的。</p>
+<p>这个方法现在广泛应用在光线追踪中</p>
+<h2 id="BVH的实现步骤"><a href="#BVH的实现步骤" class="headerlink" title="BVH的实现步骤"></a>BVH的实现步骤</h2><p>有一个场景 如下<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104111.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后将这个场景这个打的包围盒，划分成两部分，然后重新求这两部分的包围盒。<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104112.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后再对蓝色部分重新划分成蓝色和绿色，再次求包围盒<br><img src="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104113.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>KD-Tree是先将盒子分成两部分，然后再考虑物体和盒子的相交情况。<br>BVH是物体分成两部分，然后再重新求包围盒，当叶子节点里三角形数量足够少时停止。</p>
+<p>这么做BVH就有一个优点：一个物体只会出现在一个盒子里。 避免了和同一个物体多次求交</p>
+<p>但是BVH对空间的划分可能会重叠，找到一个重叠少的划分方法，也可以提高效率</p>
+<h2 id="划分的依据"><a href="#划分的依据" class="headerlink" title="划分的依据"></a>划分的依据</h2><ul>
+<li>为了让包围盒（节点）在空间中均匀分布，每一次都只沿着最长的轴将其划分。</li>
+<li>在一个节点里划分的时候取一个包围盒中间的物体，（每个三角形都有一个序号，取序号为n&#x2F;2的三角形）这样分成两部分后，这两部分里面的三角形数量差不多相同，也就是要构造一个平衡二叉树</li>
+</ul>
+<h2 id="BVH伪代码"><a href="#BVH伪代码" class="headerlink" title="BVH伪代码"></a>BVH伪代码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">Intersect(Ray ray, BVH node) &#123;<br> <span class="hljs-keyword">if</span> (ray misses node.bbox) <span class="hljs-keyword">return</span>;		<span class="hljs-comment">//光线和包围盒不相交</span><br> <span class="hljs-keyword">if</span> (node is a leaf node)				<span class="hljs-comment">//该节点时叶子节点</span><br> test intersection with all objs;		<span class="hljs-comment">//测试光线和该节点里面的所有物体是否相交</span><br> <span class="hljs-keyword">return</span> closest intersection;			<span class="hljs-comment">//返回最近的交点</span><br> hit1 = Intersect(ray, node.child1);	<span class="hljs-comment">//递归左子树</span><br> hit2 = Intersect(ray, node.child2);	<span class="hljs-comment">//递归右子树</span><br> <span class="hljs-keyword">return</span> the closer of hit1, hit2;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Unity/" class="print-no-link">#Unity</a>
+      
+        <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" class="print-no-link">#图形学</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>计算机图形学GAMES101（十三）光线追踪（加速结构）</div>
+      <div>http://example.com/2024/05/26/计算机图形学GAMES101（十三）光线追踪（加速结构）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>莫予</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E5%9B%9B%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E3%80%81%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%85%A8%E5%B1%80%E5%85%89%E7%85%A7%EF%BC%89/" title="计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86%EF%BC%89/" title="计算机图形学GAMES101（十二）光线追踪（基本原理）">
+                        <span class="hidden-mobile">计算机图形学GAMES101（十二）光线追踪（基本原理）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+    
+        <div class="footer-content">
+             <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid | 苟活于互联网边缘</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+        </div>
+        
+            
+                <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        ✨一共戳了 
+        <span id="leancloud-site-pv"></span>
+         次 |
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        ❤你是第 
+        <span id="leancloud-site-uv"></span>
+         枚看到我的
+      </span>
+    
+    
+
+  
+</div>
+
+                    
+                        
+                                    
+</div>
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/DynamicRibbon.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/love.min.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/kasumi_event128.model.json"},"display":{"superSample":2,"width":200,"height":400,"position":"left","hOffset":20,"vOffset":0},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"dialog":{"enable":true,"text":["pop，pipapipa~","这里不可以","星星在天上而你在我心里ヾ(≧▽≦*)o"]},"log":false});</script></body>
+</html>
