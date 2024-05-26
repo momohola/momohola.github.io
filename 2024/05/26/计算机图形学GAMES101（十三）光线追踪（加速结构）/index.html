@@ -23,27 +23,14 @@
 <meta property="og:site_name" content="莫予的人间大宝藏">
 <meta property="og:description" content="AABB是怎么加速光线追踪的 网格划分（Uniform grids） 空间划分（Spatial partitions）  网格划分（Uniform grids）1、找出包围盒2、划分网格3、找到有物体的格子假设光线和格子求交是很快的，和物体求交很慢 这个时候有一条光线穿过这个包围盒，光线穿过的格子为蓝色。当光线走到一个有物体的格子就说明光线可能和物体相交，这个时候就需要求光线和物体是否相交了。其中">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210391.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210392.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210403.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210404.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210405.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210406.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210407.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210408.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-17167104210419.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104110.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104111.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104112.png">
-<meta property="og:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16-171671042104113.png">
+<meta property="og:image" content="http://example.com/img/head-663997_1280.jpg">
 <meta property="article:published_time" content="2024-05-26T07:59:58.000Z">
-<meta property="article:modified_time" content="2024-05-26T08:00:42.700Z">
+<meta property="article:modified_time" content="2024-05-26T09:07:27.122Z">
 <meta property="article:author" content="莫予">
 <meta property="article:tag" content="Unity">
 <meta property="article:tag" content="图形学">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/05/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6GAMES101%EF%BC%88%E5%8D%81%E4%B8%89%EF%BC%89%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAbW9tb2hvbGE=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+<meta name="twitter:image" content="http://example.com/img/head-663997_1280.jpg">
   
   
   
@@ -240,7 +227,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/bg8.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
