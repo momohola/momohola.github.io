@@ -23,23 +23,14 @@
 <meta property="og:site_name" content="莫予的人间大宝藏">
 <meta property="og:description" content="前言：使用Unity开发的游戏需要支持泰语本地化，以及解决显示泰语时Unity的bug  现在很多游戏都需要显示泰语，下面将介绍Unity如何显示泰语，（仅介绍Unity字体方面的设置步骤以及Unity在显示泰语时的bug和解决方案，具体游戏里面如何切换语言不做过多介绍） Unity里面显示文本的组件主要有下面几个：   Text组件 TextMesh组件（不介绍） TextMeshPro组件">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/2d1291b4fde64265935844795fca91d9.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/1e8067e7154d42709c8d84fe6cc139a6.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/0c5b24772e3747418f380006abc238d7.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/dd41341272bf49c484ad8b6921f07561.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/f5b8ff6290c04e10bafc9ad933d05f62.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/004c64af47174d9da7b2e3bc1aa55f47.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/ebc0c8ac39154e03837b66e5e7b62b41.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/fb14d929392e47b09bc395e5179b93dc.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/365516f8ebc248869656f223c722b213.png">
-<meta property="og:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/bb595f8d454c4cd09e361697376a6171.png">
+<meta property="og:image" content="http://example.com/img/unitythaiadjust.png">
 <meta property="article:published_time" content="2024-08-07T17:11:15.000Z">
-<meta property="article:modified_time" content="2024-09-07T17:19:42.461Z">
+<meta property="article:modified_time" content="2024-09-07T17:26:28.597Z">
 <meta property="article:author" content="莫予">
 <meta property="article:tag" content="Unity">
 <meta property="article:tag" content="多语言本地化">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/08/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/2d1291b4fde64265935844795fca91d9.png">
+<meta name="twitter:image" content="http://example.com/img/unitythaiadjust.png">
   
   
   
