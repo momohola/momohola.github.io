@@ -18,32 +18,32 @@
   
     <meta name="description" content="前言：使用Unity开发的游戏需要支持泰语本地化，以及解决显示泰语时Unity的bug  现在很多游戏都需要显示泰语，下面将介绍Unity如何显示泰语，（仅介绍Unity字体方面的设置步骤以及Unity在显示泰语时的bug和解决方案，具体游戏里面如何切换语言不做过多介绍） Unity里面显示文本的组件主要有下面几个：   Text组件 TextMesh组件（不介绍） TextMeshPro组件">
 <meta property="og:type" content="article">
-<meta property="og:title" content="UnityThai">
-<meta property="og:url" content="http://example.com/2024/09/08/UnityThai/index.html">
+<meta property="og:title" content="Unity泰语支持以及泰语显示bug解决">
+<meta property="og:url" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/index.html">
 <meta property="og:site_name" content="莫予的人间大宝藏">
 <meta property="og:description" content="前言：使用Unity开发的游戏需要支持泰语本地化，以及解决显示泰语时Unity的bug  现在很多游戏都需要显示泰语，下面将介绍Unity如何显示泰语，（仅介绍Unity字体方面的设置步骤以及Unity在显示泰语时的bug和解决方案，具体游戏里面如何切换语言不做过多介绍） Unity里面显示文本的组件主要有下面几个：   Text组件 TextMesh组件（不介绍） TextMeshPro组件">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/2d1291b4fde64265935844795fca91d9.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/1e8067e7154d42709c8d84fe6cc139a6.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/0c5b24772e3747418f380006abc238d7.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/dd41341272bf49c484ad8b6921f07561.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/f5b8ff6290c04e10bafc9ad933d05f62.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/004c64af47174d9da7b2e3bc1aa55f47.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/ebc0c8ac39154e03837b66e5e7b62b41.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/fb14d929392e47b09bc395e5179b93dc.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/365516f8ebc248869656f223c722b213.png">
-<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/bb595f8d454c4cd09e361697376a6171.png">
-<meta property="article:published_time" content="2024-09-07T17:00:49.000Z">
-<meta property="article:modified_time" content="2024-09-07T17:06:41.078Z">
+<meta property="og:image" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/2d1291b4fde64265935844795fca91d9.png">
+<meta property="og:image" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/1e8067e7154d42709c8d84fe6cc139a6.png">
+<meta property="og:image" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/0c5b24772e3747418f380006abc238d7.png">
+<meta property="og:image" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/dd41341272bf49c484ad8b6921f07561.png">
+<meta property="og:image" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/f5b8ff6290c04e10bafc9ad933d05f62.png">
+<meta property="og:image" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/004c64af47174d9da7b2e3bc1aa55f47.png">
+<meta property="og:image" content="https://i-blog.csdnimg.cn/direct/ebc0c8ac39154e03837b66e5e7b62b41.png#pic_center">
+<meta property="og:image" content="https://i-blog.csdnimg.cn/direct/fb14d929392e47b09bc395e5179b93dc.png#pic_center">
+<meta property="og:image" content="https://i-blog.csdnimg.cn/direct/365516f8ebc248869656f223c722b213.png#pic_center">
+<meta property="og:image" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/bb595f8d454c4cd09e361697376a6171.png">
+<meta property="article:published_time" content="2024-09-07T17:11:15.000Z">
+<meta property="article:modified_time" content="2024-09-07T17:12:54.693Z">
 <meta property="article:author" content="莫予">
 <meta property="article:tag" content="Unity">
 <meta property="article:tag" content="编辑器开发">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/09/08/UnityThai/2d1291b4fde64265935844795fca91d9.png">
+<meta name="twitter:image" content="http://example.com/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/2d1291b4fde64265935844795fca91d9.png">
   
   
   
-  <title>UnityThai - 莫予的人间大宝藏</title>
+  <title>Unity泰语支持以及泰语显示bug解决 - 莫予的人间大宝藏</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -242,7 +242,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="UnityThai"></span>
+            <span id="subtitle" data-typed-text="Unity泰语支持以及泰语显示bug解决"></span>
           
         </div>
 
@@ -253,7 +253,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-09-08 01:00" pubdate>
+        <time datetime="2024-09-08 01:11" pubdate>
           2024年9月8日 凌晨
         </time>
       </span>
@@ -321,7 +321,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">UnityThai</h1>
+            <h1 id="seo-header">Unity泰语支持以及泰语显示bug解决</h1>
             
               <p id="updated-time" class="note note-info" style="">
                 
@@ -348,18 +348,18 @@
 </blockquote>
 <p>TextMesh组件的解决方案和Text组件类似，所以不做介绍。本文章中所有提到的资源文件在文末的链接下载。</p>
 <h2 id="1、Text组件显示泰语"><a href="#1、Text组件显示泰语" class="headerlink" title="1、Text组件显示泰语"></a>1、Text组件显示泰语</h2><p>首先需要找到一套能支持泰语的字体，这里推荐Tahoma.ttf字体，当我们拿到这套字体之后，在Unity里面试试效果。</p>
-<p>额。。。看起来很完美，文字都是正常显示的。但是这个音标和泰语的字符中间怎么有这么大的间隙呢？那是因为Unity字体渲染器缺乏对 GPOS 和 GSUB 的支持。因为泰语字体很大程度上依赖于这些功能，所以如果没有它们，渲染的图像看起来很难看。而且对于泰国人来说这样的文字不方便阅读。<br><img src="/2024/09/08/UnityThai/2d1291b4fde64265935844795fca91d9.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>我们将文字复制到其他软件中看看效果：<br><img src="/2024/09/08/UnityThai/1e8067e7154d42709c8d84fe6cc139a6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>可以看到在其他软件中泰语的音标和字符之间没有任何间隙，这样看起来就舒服多了。接下来介绍如何在Unity里面实现类似效果。</p>
+<p>额。。。看起来很完美，文字都是正常显示的。但是这个音标和泰语的字符中间怎么有这么大的间隙呢？那是因为Unity字体渲染器缺乏对 GPOS 和 GSUB 的支持。因为泰语字体很大程度上依赖于这些功能，所以如果没有它们，渲染的图像看起来很难看。而且对于泰国人来说这样的文字不方便阅读。<br><img src="/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/2d1291b4fde64265935844795fca91d9.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>我们将文字复制到其他软件中看看效果：<br><img src="/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/1e8067e7154d42709c8d84fe6cc139a6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>可以看到在其他软件中泰语的音标和字符之间没有任何间隙，这样看起来就舒服多了。接下来介绍如何在Unity里面实现类似效果。</p>
 <p>对于Text组件显示泰语需要用ThaiFontUtility.Adjust接口在复制之前进行转换一下。在执行一下代码之后泰语音标就正常了。</p>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Update</span>()</span><br>&#123;<br>    text.text = ThaiFontUtility.Adjust(<span class="hljs-string">&quot;กิจกรรมเช็กอินฤดูใบไม้ร่วงสิ้นสุดแล้ว ระบบตรวจพบว่าคุณมีรางวัลล็อกอินที่ยังไม่ได้รับและได้ส่งทางจดหมายแล้ว กรุณาตรวจรับ&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
-<p><img src="/2024/09/08/UnityThai/0c5b24772e3747418f380006abc238d7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>调用这个接口的时机也可以放到Text组件里面给text赋值的时候<br><img src="/2024/09/08/UnityThai/dd41341272bf49c484ad8b6921f07561.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>注意：</strong><br>ThaiFontAdjuster 只能处理特殊字体。这种字体需要具备从 U+F700 到 U+F71A 的扩展字形，从而提供泰语字符的各种位置。这也就是为什么之前推荐使用Tahoma.ttf字体了。</p>
+<p><img src="/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/0c5b24772e3747418f380006abc238d7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>调用这个接口的时机也可以放到Text组件里面给text赋值的时候<br><img src="/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/dd41341272bf49c484ad8b6921f07561.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>注意：</strong><br>ThaiFontAdjuster 只能处理特殊字体。这种字体需要具备从 U+F700 到 U+F71A 的扩展字形，从而提供泰语字符的各种位置。这也就是为什么之前推荐使用Tahoma.ttf字体了。</p>
 <p><strong>原理：</strong><br>其实原理就是将原本的字符替换为其他字符，被替换的字符含义不变，只是相对位置变了而已。替换规则如下：</p>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-comment">// ========== EXTENDED CHARACTER TABLE ==========</span><br><span class="hljs-comment">// F700:     uni0E10.descless    (base.descless)</span><br><span class="hljs-comment">// F701~04:  uni0E34~37.left     (upper.left)</span><br><span class="hljs-comment">// F705~09:  uni0E48~4C.lowleft  (top.lowleft)</span><br><span class="hljs-comment">// F70A~0E:  uni0E48~4C.low      (top.low)</span><br><span class="hljs-comment">// F70F:     uni0E0D.descless    (base.descless)</span><br><span class="hljs-comment">// F710~12:  uni0E31,4D,47.left  (upper.left)</span><br><span class="hljs-comment">// F713~17:  uni0E48~4C.left     (top.left)</span><br><span class="hljs-comment">// F718~1A:  uni0E38~3A.low      (lower.low)</span><br><span class="hljs-comment">// ==============================================</span><br><span class="hljs-comment">// [base]             [top] -&gt; [base]             [top.low]</span><br><span class="hljs-comment">// [base]     [lower] [top] -&gt; [base]     [lower] [top.low]</span><br><span class="hljs-comment">// [base.asc]         [top] -&gt; [base.asc]         [top.lowleft]</span><br><span class="hljs-comment">// [base.asc] [lower] [top] -&gt; [base.asc] [lower] [top.lowleft]</span><br></code></pre></td></tr></table></figure>
 <hr>
 <br>
 
-<h2 id="2、TextMeshPro组件显示泰语"><a href="#2、TextMeshPro组件显示泰语" class="headerlink" title="2、TextMeshPro组件显示泰语"></a>2、TextMeshPro组件显示泰语</h2><p>第一步需要创建一套泰语的SDF字体，这里使用AlibabaSansThaiMedium.ttf字体（任意字体均可，无硬性要求），右键该字体 -&gt;Create-&gt;TextMeshPro-&gt;FontAsset。<br><img src="/2024/09/08/UnityThai/f5b8ff6290c04e10bafc9ad933d05f62.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后选中改字体点击【Update Atlas Texture】<br><img src="/2024/09/08/UnityThai/004c64af47174d9da7b2e3bc1aa55f47.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>按照下面的示意图进行设置<br><img src="/2024/09/08/UnityThai/ebc0c8ac39154e03837b66e5e7b62b41.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>其中蓝色方框内的内容填入下面这个：</p>
+<h2 id="2、TextMeshPro组件显示泰语"><a href="#2、TextMeshPro组件显示泰语" class="headerlink" title="2、TextMeshPro组件显示泰语"></a>2、TextMeshPro组件显示泰语</h2><p>第一步需要创建一套泰语的SDF字体，这里使用AlibabaSansThaiMedium.ttf字体（任意字体均可，无硬性要求），右键该字体 -&gt;Create-&gt;TextMeshPro-&gt;FontAsset。<br><img src="/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/f5b8ff6290c04e10bafc9ad933d05f62.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后选中改字体点击【Update Atlas Texture】<br><img src="/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/004c64af47174d9da7b2e3bc1aa55f47.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>按照下面的示意图进行设置<br><img src="https://i-blog.csdnimg.cn/direct/ebc0c8ac39154e03837b66e5e7b62b41.png#pic_center" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>其中蓝色方框内的内容填入下面这个：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">③CНฉ์<span class="hljs-number">3</span>v≧ü<span class="hljs-meta">#fрฬVаผ以FРฌ6y฿&amp;（iуฯYгฟ【I…ฏⅡ　9；|～Бโ)lา\□•ย	Lฒ④Ⅴ<span class="hljs-string">&lt;⑥ข❦,oี_йล“O⑤ต?м่/한ุ！b¥ГศRธB어Мзจ๋ωuя≦&quot;ếeใหUปEПซ5x¡%hтฮXвพH《2ฎⅠู8：&#123;แ(kñั[еá—KฑⅣ。;~กไr+nิиäฤNด&gt;</span>◆ค็.qыืaлçวQ×ท①สAЛง๊1t·≥!dюо”Tบ》Dชํ4wД$gсíอWฝGСญ7zเ<span class="hljs-string">&#x27;）jะZภ】J②ฐⅢ、:＜&#125;￥*，mệóำ] ร</span></span><br><span class="hljs-string"><span class="hljs-meta">MЧณ=？ฃๆ-pึ﻿к’</span></span><br><span class="hljs-string"><span class="hljs-meta">Pมถ@ฆ้0s≤ ‘cнéษSน</span></span><br></code></pre></td></tr></table></figure>
-<p>这一套操作下来就可以发现现在TextMeshPro组件现在就可以显示泰语字体了。<br><img src="/2024/09/08/UnityThai/fb14d929392e47b09bc395e5179b93dc.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>但是，是不是发现了这个位置有点不正常，这里有两个字符重叠了（可以对照上面的Text组件的显示效果）。下面来解决TMP组件显示泰语音标重叠的问题。<br><br><br>解决这个问题也简单，使用AdjustWannayuk工具设置一下音标表的偏移值就行。<br><img src="/2024/09/08/UnityThai/365516f8ebc248869656f223c722b213.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>右键SDF的字体文件选择AdjustWannayuk命令，然后就设置好了。这个时候就正常了，而且不需要调用ThaiFontUtility.Adjust接口，音标的位置也是正确的。<br><img src="/2024/09/08/UnityThai/bb595f8d454c4cd09e361697376a6171.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>工具以及字体资源的下载地址：<br><a target="_blank" rel="noopener" href="https://github.com/momohola/Unity-Thai-Adjust">https://github.com/momohola/Unity-Thai-Adjust</a></p>
+<p>这一套操作下来就可以发现现在TextMeshPro组件现在就可以显示泰语字体了。<br><img src="https://i-blog.csdnimg.cn/direct/fb14d929392e47b09bc395e5179b93dc.png#pic_center" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>但是，是不是发现了这个位置有点不正常，这里有两个字符重叠了（可以对照上面的Text组件的显示效果）。下面来解决TMP组件显示泰语音标重叠的问题。<br><br><br>解决这个问题也简单，使用AdjustWannayuk工具设置一下音标表的偏移值就行。<br><img src="https://i-blog.csdnimg.cn/direct/365516f8ebc248869656f223c722b213.png#pic_center" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>右键SDF的字体文件选择AdjustWannayuk命令，然后就设置好了。这个时候就正常了，而且不需要调用ThaiFontUtility.Adjust接口，音标的位置也是正确的。<br><img src="/2024/09/08/Unity%E6%B3%B0%E8%AF%AD%E6%94%AF%E6%8C%81%E4%BB%A5%E5%8F%8A%E6%B3%B0%E8%AF%AD%E6%98%BE%E7%A4%BAbug%E8%A7%A3%E5%86%B3/bb595f8d454c4cd09e361697376a6171.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>工具以及字体资源的下载地址：<br><a target="_blank" rel="noopener" href="https://github.com/momohola/Unity-Thai-Adjust">https://github.com/momohola/Unity-Thai-Adjust</a></p>
 
                 
               </div>
@@ -386,8 +386,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>UnityThai</div>
-      <div>http://example.com/2024/09/08/UnityThai/</div>
+      <div>Unity泰语支持以及泰语显示bug解决</div>
+      <div>http://example.com/2024/09/08/Unity泰语支持以及泰语显示bug解决/</div>
     </div>
     <div class="license-meta">
       
