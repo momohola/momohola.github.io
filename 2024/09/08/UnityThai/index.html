@@ -1,0 +1,747 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/myTitleIcon.png">
+  <link rel="icon" href="/img/myTitleIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="莫予">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言：使用Unity开发的游戏需要支持泰语本地化，以及解决显示泰语时Unity的bug  现在很多游戏都需要显示泰语，下面将介绍Unity如何显示泰语，（仅介绍Unity字体方面的设置步骤以及Unity在显示泰语时的bug和解决方案，具体游戏里面如何切换语言不做过多介绍） Unity里面显示文本的组件主要有下面几个：   Text组件 TextMesh组件（不介绍） TextMeshPro组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UnityThai">
+<meta property="og:url" content="http://example.com/2024/09/08/UnityThai/index.html">
+<meta property="og:site_name" content="莫予的人间大宝藏">
+<meta property="og:description" content="前言：使用Unity开发的游戏需要支持泰语本地化，以及解决显示泰语时Unity的bug  现在很多游戏都需要显示泰语，下面将介绍Unity如何显示泰语，（仅介绍Unity字体方面的设置步骤以及Unity在显示泰语时的bug和解决方案，具体游戏里面如何切换语言不做过多介绍） Unity里面显示文本的组件主要有下面几个：   Text组件 TextMesh组件（不介绍） TextMeshPro组件">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/2d1291b4fde64265935844795fca91d9.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/1e8067e7154d42709c8d84fe6cc139a6.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/0c5b24772e3747418f380006abc238d7.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/dd41341272bf49c484ad8b6921f07561.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/f5b8ff6290c04e10bafc9ad933d05f62.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/004c64af47174d9da7b2e3bc1aa55f47.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/ebc0c8ac39154e03837b66e5e7b62b41.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/fb14d929392e47b09bc395e5179b93dc.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/365516f8ebc248869656f223c722b213.png">
+<meta property="og:image" content="http://example.com/2024/09/08/UnityThai/bb595f8d454c4cd09e361697376a6171.png">
+<meta property="article:published_time" content="2024-09-07T17:00:49.000Z">
+<meta property="article:modified_time" content="2024-09-07T17:06:41.078Z">
+<meta property="article:author" content="莫予">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="编辑器开发">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/09/08/UnityThai/2d1291b4fde64265935844795fca91d9.png">
+  
+  
+  
+  <title>UnityThai - 莫予的人间大宝藏</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/scroll.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":55,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"F9Y5mCKv9ARqmAKZyYohD39E-gzGzoHsz","app_key":"SAkoCxXOO3Ug37vyt1y7vT2Z","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>莫予&#39;Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="UnityThai"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-09-08 01:00" pubdate>
+          2024年9月8日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">UnityThai</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    本文最后更新于 2024年9月8日 凌晨
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>前言：使用Unity开发的游戏需要支持泰语本地化，以及解决显示泰语时Unity的bug</p>
+</blockquote>
+<p>现在很多游戏都需要显示泰语，下面将介绍Unity如何显示泰语，（仅介绍Unity字体方面的设置步骤以及Unity在显示泰语时的bug和解决方案，具体游戏里面如何切换语言不做过多介绍）</p>
+<p>Unity里面显示文本的组件主要有下面几个：</p>
+<blockquote>
+<ul>
+<li>Text组件</li>
+<li>TextMesh组件（不介绍）</li>
+<li>TextMeshPro组件</li>
+</ul>
+</blockquote>
+<p>TextMesh组件的解决方案和Text组件类似，所以不做介绍。本文章中所有提到的资源文件在文末的链接下载。</p>
+<h2 id="1、Text组件显示泰语"><a href="#1、Text组件显示泰语" class="headerlink" title="1、Text组件显示泰语"></a>1、Text组件显示泰语</h2><p>首先需要找到一套能支持泰语的字体，这里推荐Tahoma.ttf字体，当我们拿到这套字体之后，在Unity里面试试效果。</p>
+<p>额。。。看起来很完美，文字都是正常显示的。但是这个音标和泰语的字符中间怎么有这么大的间隙呢？那是因为Unity字体渲染器缺乏对 GPOS 和 GSUB 的支持。因为泰语字体很大程度上依赖于这些功能，所以如果没有它们，渲染的图像看起来很难看。而且对于泰国人来说这样的文字不方便阅读。<br><img src="/2024/09/08/UnityThai/2d1291b4fde64265935844795fca91d9.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>我们将文字复制到其他软件中看看效果：<br><img src="/2024/09/08/UnityThai/1e8067e7154d42709c8d84fe6cc139a6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>可以看到在其他软件中泰语的音标和字符之间没有任何间隙，这样看起来就舒服多了。接下来介绍如何在Unity里面实现类似效果。</p>
+<p>对于Text组件显示泰语需要用ThaiFontUtility.Adjust接口在复制之前进行转换一下。在执行一下代码之后泰语音标就正常了。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Update</span>()</span><br>&#123;<br>    text.text = ThaiFontUtility.Adjust(<span class="hljs-string">&quot;กิจกรรมเช็กอินฤดูใบไม้ร่วงสิ้นสุดแล้ว ระบบตรวจพบว่าคุณมีรางวัลล็อกอินที่ยังไม่ได้รับและได้ส่งทางจดหมายแล้ว กรุณาตรวจรับ&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><img src="/2024/09/08/UnityThai/0c5b24772e3747418f380006abc238d7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>调用这个接口的时机也可以放到Text组件里面给text赋值的时候<br><img src="/2024/09/08/UnityThai/dd41341272bf49c484ad8b6921f07561.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>注意：</strong><br>ThaiFontAdjuster 只能处理特殊字体。这种字体需要具备从 U+F700 到 U+F71A 的扩展字形，从而提供泰语字符的各种位置。这也就是为什么之前推荐使用Tahoma.ttf字体了。</p>
+<p><strong>原理：</strong><br>其实原理就是将原本的字符替换为其他字符，被替换的字符含义不变，只是相对位置变了而已。替换规则如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-comment">// ========== EXTENDED CHARACTER TABLE ==========</span><br><span class="hljs-comment">// F700:     uni0E10.descless    (base.descless)</span><br><span class="hljs-comment">// F701~04:  uni0E34~37.left     (upper.left)</span><br><span class="hljs-comment">// F705~09:  uni0E48~4C.lowleft  (top.lowleft)</span><br><span class="hljs-comment">// F70A~0E:  uni0E48~4C.low      (top.low)</span><br><span class="hljs-comment">// F70F:     uni0E0D.descless    (base.descless)</span><br><span class="hljs-comment">// F710~12:  uni0E31,4D,47.left  (upper.left)</span><br><span class="hljs-comment">// F713~17:  uni0E48~4C.left     (top.left)</span><br><span class="hljs-comment">// F718~1A:  uni0E38~3A.low      (lower.low)</span><br><span class="hljs-comment">// ==============================================</span><br><span class="hljs-comment">// [base]             [top] -&gt; [base]             [top.low]</span><br><span class="hljs-comment">// [base]     [lower] [top] -&gt; [base]     [lower] [top.low]</span><br><span class="hljs-comment">// [base.asc]         [top] -&gt; [base.asc]         [top.lowleft]</span><br><span class="hljs-comment">// [base.asc] [lower] [top] -&gt; [base.asc] [lower] [top.lowleft]</span><br></code></pre></td></tr></table></figure>
+<hr>
+<br>
+
+<h2 id="2、TextMeshPro组件显示泰语"><a href="#2、TextMeshPro组件显示泰语" class="headerlink" title="2、TextMeshPro组件显示泰语"></a>2、TextMeshPro组件显示泰语</h2><p>第一步需要创建一套泰语的SDF字体，这里使用AlibabaSansThaiMedium.ttf字体（任意字体均可，无硬性要求），右键该字体 -&gt;Create-&gt;TextMeshPro-&gt;FontAsset。<br><img src="/2024/09/08/UnityThai/f5b8ff6290c04e10bafc9ad933d05f62.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后选中改字体点击【Update Atlas Texture】<br><img src="/2024/09/08/UnityThai/004c64af47174d9da7b2e3bc1aa55f47.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>按照下面的示意图进行设置<br><img src="/2024/09/08/UnityThai/ebc0c8ac39154e03837b66e5e7b62b41.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>其中蓝色方框内的内容填入下面这个：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">③CНฉ์<span class="hljs-number">3</span>v≧ü<span class="hljs-meta">#fрฬVаผ以FРฌ6y฿&amp;（iуฯYгฟ【I…ฏⅡ　9；|～Бโ)lา\□•ย	Lฒ④Ⅴ<span class="hljs-string">&lt;⑥ข❦,oี_йล“O⑤ต?м่/한ุ！b¥ГศRธB어Мзจ๋ωuя≦&quot;ếeใหUปEПซ5x¡%hтฮXвพH《2ฎⅠู8：&#123;แ(kñั[еá—KฑⅣ。;~กไr+nิиäฤNด&gt;</span>◆ค็.qыืaлçวQ×ท①สAЛง๊1t·≥!dюо”Tบ》Dชํ4wД$gсíอWฝGСญ7zเ<span class="hljs-string">&#x27;）jะZภ】J②ฐⅢ、:＜&#125;￥*，mệóำ] ร</span></span><br><span class="hljs-string"><span class="hljs-meta">MЧณ=？ฃๆ-pึ﻿к’</span></span><br><span class="hljs-string"><span class="hljs-meta">Pมถ@ฆ้0s≤ ‘cнéษSน</span></span><br></code></pre></td></tr></table></figure>
+<p>这一套操作下来就可以发现现在TextMeshPro组件现在就可以显示泰语字体了。<br><img src="/2024/09/08/UnityThai/fb14d929392e47b09bc395e5179b93dc.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>但是，是不是发现了这个位置有点不正常，这里有两个字符重叠了（可以对照上面的Text组件的显示效果）。下面来解决TMP组件显示泰语音标重叠的问题。<br><br><br>解决这个问题也简单，使用AdjustWannayuk工具设置一下音标表的偏移值就行。<br><img src="/2024/09/08/UnityThai/365516f8ebc248869656f223c722b213.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>右键SDF的字体文件选择AdjustWannayuk命令，然后就设置好了。这个时候就正常了，而且不需要调用ThaiFontUtility.Adjust接口，音标的位置也是正确的。<br><img src="/2024/09/08/UnityThai/bb595f8d454c4cd09e361697376a6171.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>工具以及字体资源的下载地址：<br><a target="_blank" rel="noopener" href="https://github.com/momohola/Unity-Thai-Adjust">https://github.com/momohola/Unity-Thai-Adjust</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Unity/" class="print-no-link">#Unity</a>
+      
+        <a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8%E5%BC%80%E5%8F%91/" class="print-no-link">#编辑器开发</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>UnityThai</div>
+      <div>http://example.com/2024/09/08/UnityThai/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>莫予</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年9月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/26/Unity-hyphen/" title="Unity英文自动添加连词符“-”">
+                        <span class="hidden-mobile">Unity英文自动添加连词符“-”</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+    
+        <div class="footer-content">
+             <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid | 苟活于互联网边缘</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+        </div>
+        
+            
+                <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        ✨一共戳了 
+        <span id="leancloud-site-pv"></span>
+         次 |
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        ❤你是第 
+        <span id="leancloud-site-uv"></span>
+         枚看到我的
+      </span>
+    
+    
+
+  
+</div>
+
+                    
+                        
+                                    
+</div>
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/DynamicRibbon.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/EmoryHuang/BlogBeautify@1.1/love.min.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/kasumi_event128.model.json"},"display":{"superSample":2,"width":200,"height":400,"position":"left","hOffset":20,"vOffset":0},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"dialog":{"enable":true,"text":["pop，pipapipa~","这里不可以","星星在天上而你在我心里ヾ(≧▽≦*)o"]},"log":false});</script></body>
+</html>
