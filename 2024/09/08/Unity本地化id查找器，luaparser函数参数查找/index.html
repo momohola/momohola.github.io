@@ -1,11 +1,4 @@
-
-
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=auto>
-
-
-
-<head>
+<!DOCTYPE html><html lang="zh-CN" data-default-color-scheme="auto"><head>
   <meta charset="UTF-8">
   <link rel="apple-touch-icon" sizes="76x76" href="/img/myTitleIcon.png">
   <link rel="icon" href="/img/myTitleIcon.png">
@@ -25,7 +18,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/langidFinder.png">
 <meta property="article:published_time" content="2024-09-07T17:17:44.000Z">
-<meta property="article:modified_time" content="2024-09-07T17:25:57.529Z">
+<meta property="article:modified_time" content="2024-09-07T18:07:38.668Z">
 <meta property="article:author" content="莫予">
 <meta property="article:tag" content="Unity">
 <meta property="article:tag" content="编辑器开发">
@@ -36,15 +29,15 @@
   
   <title>Unity本地化id查找器，luaparser函数参数查找 - 莫予的人间大宝藏</title>
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css">
 
 
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css">
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+  <link rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css">
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+  <link rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css">
 
 
 
@@ -58,12 +51,12 @@
 <link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
 
 
-<link  rel="stylesheet" href="/css/main.css" />
+<link rel="stylesheet" href="/css/main.css">
 
 
-  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css">
   
-    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css">
   
 
 
@@ -83,15 +76,15 @@
       Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
     }
   </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/color-schema.js"></script>
   
 
   
 
   
     <!-- Google tag (gtag.js) -->
-    <script async>
+    <script async="">
       if (!Fluid.ctx.dnt) {
         Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
           window.dataLayer = window.dataLayer || [];
@@ -131,12 +124,10 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>莫予&#39;Blog</strong>
+      <strong>莫予'Blog</strong>
     </a>
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <div class="animated-icon"><span></span><span></span><span></span></div>
     </button>
 
@@ -226,8 +217,7 @@
 
   
 
-<div id="banner" class="banner" parallax=true
-     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+<div id="banner" class="banner" parallax="true" style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -244,7 +234,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-09-08 01:17" pubdate>
+        <time datetime="2024-09-08 01:17" pubdate="">
           2024年9月8日 凌晨
         </time>
       </span>
@@ -329,7 +319,7 @@
 <p>前言：<br>适用范围：Unity 中需要查找所有预制体里面的某一个脚本的属性值，或者Lua脚本里面的某一个属性值<br>本文介绍如何查找预制体和Lua脚本里面调用的本地化id</p>
 </blockquote>
 <p>下面首先介绍改插件的功能以及使用方法，然后对该插件的原理进行说明</p>
-<h2 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h2><p>本插件能够查找到预制体和lua脚本里面那些地方调用了指定的本地化id。操作步骤：首先在LangID输入框中输入要查找的id（使用分号间隔），也可以直接从csv文件导入id。点击【查找】按钮，就可以找到对应的id被哪些预制体和lua代码调用了。<br><img src="/2024/09/08/Unity%E6%9C%AC%E5%9C%B0%E5%8C%96id%E6%9F%A5%E6%89%BE%E5%99%A8%EF%BC%8Cluaparser%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E6%9F%A5%E6%89%BE/46491c1db11f4632a34365294ed82238.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>【打开】按钮会调用默认编辑器打开对应的文件<br>【更新Lua代码索引】按钮会运行python程序生成lua代码的索引文件<br>【设置】按钮用于设置本地化函数名</p>
+<h2 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h2><p>本插件能够查找到预制体和lua脚本里面那些地方调用了指定的本地化id。操作步骤：首先在LangID输入框中输入要查找的id（使用分号间隔），也可以直接从csv文件导入id。点击【查找】按钮，就可以找到对应的id被哪些预制体和lua代码调用了。<br><img src="/2024/09/08/Unity%E6%9C%AC%E5%9C%B0%E5%8C%96id%E6%9F%A5%E6%89%BE%E5%99%A8%EF%BC%8Cluaparser%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E6%9F%A5%E6%89%BE/46491c1db11f4632a34365294ed82238.png" srcset="/img/loading.gif" lazyload="" alt="在这里插入图片描述"><br>【打开】按钮会调用默认编辑器打开对应的文件<br>【更新Lua代码索引】按钮会运行python程序生成lua代码的索引文件<br>【设置】按钮用于设置本地化函数名</p>
 <hr>
 <h2 id="插件原理说明"><a href="#插件原理说明" class="headerlink" title="插件原理说明"></a>插件原理说明</h2><blockquote>
 <p>首先需要确保工程已经安装了Odin Inspector插件，否则无法运行本插件。</p>
@@ -337,26 +327,150 @@
 <p>因为是要查找指定的本地化id，那么可以按照功能模块将代码分为两部分——查找预制体和查找Lua代码。</p>
 <h4 id="查找Lua代码中的本地化id"><a href="#查找Lua代码中的本地化id" class="headerlink" title="查找Lua代码中的本地化id"></a>查找Lua代码中的本地化id</h4><p>假设获取本地化id的函数名为lang.Get。<br>那么，是不是使用正则匹配lang.Get这个字符串，然后就可以获取调用的id了呢？实际项目中情况可能更复杂。</p>
 <p>通过总结实际项目中代码的编写格式，可以将函数调用分为一下几种情况</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs lua"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">test</span><span class="hljs-params">()</span></span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;function test&quot;</span>)<br>    <br>    <span class="hljs-comment">--参数为常量</span><br>    lang.Get(<span class="hljs-number">10000</span>)<br>    lang.Get(<span class="hljs-number">10000</span> + <span class="hljs-number">10</span>)<br>    <br>    <span class="hljs-comment">--参数包含变量的情况</span><br>    <span class="hljs-keyword">local</span> id = <span class="hljs-number">20</span><br>    lang.Get(id)<br>    lang.Get(<span class="hljs-number">10000</span> + id)<br>    lang.Get(id + <span class="hljs-number">10000</span>)<br>    <br>    <span class="hljs-comment">--参数包含table的情况</span><br>    <span class="hljs-keyword">local</span> LANG_ENUM = &#123;<br>        id1 = <span class="hljs-number">10000</span>,<br>        id2 = <span class="hljs-number">10001</span>,<br>        id3 = <span class="hljs-number">10002</span>,<br>    &#125;<br>    lang.Get(LANG_ENUM.id1)<br>    lang.Get(LANG_ENUM.id2)<br>    lang.Get(LANG_ENUM.id3)<br>    <br>    <span class="hljs-keyword">local</span> LANG_ARRAY = &#123;<span class="hljs-number">20000</span>, <span class="hljs-number">20001</span>, <span class="hljs-number">20002</span>&#125;<br>    lang.Get(LANG_ARRAY[<span class="hljs-number">1</span>])<br>    lang.Get(LANG_ARRAY[<span class="hljs-number">2</span>])<br><span class="hljs-keyword">end</span><br><br></code></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs lua"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">test</span><span class="hljs-params">()</span></span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">"function test"</span>)<br>    <br>    <span class="hljs-comment">--参数为常量</span><br>    lang.Get(<span class="hljs-number">10000</span>)<br>    lang.Get(<span class="hljs-number">10000</span> + <span class="hljs-number">10</span>)<br>    <br>    <span class="hljs-comment">--参数包含变量的情况</span><br>    <span class="hljs-keyword">local</span> id = <span class="hljs-number">20</span><br>    lang.Get(id)<br>    lang.Get(<span class="hljs-number">10000</span> + id)<br>    lang.Get(id + <span class="hljs-number">10000</span>)<br>    <br>    <span class="hljs-comment">--参数包含table的情况</span><br>    <span class="hljs-keyword">local</span> LANG_ENUM = {<br>        id1 = <span class="hljs-number">10000</span>,<br>        id2 = <span class="hljs-number">10001</span>,<br>        id3 = <span class="hljs-number">10002</span>,<br>    }<br>    lang.Get(LANG_ENUM.id1)<br>    lang.Get(LANG_ENUM.id2)<br>    lang.Get(LANG_ENUM.id3)<br>    <br>    <span class="hljs-keyword">local</span> LANG_ARRAY = {<span class="hljs-number">20000</span>, <span class="hljs-number">20001</span>, <span class="hljs-number">20002</span>}<br>    lang.Get(LANG_ARRAY[<span class="hljs-number">1</span>])<br>    lang.Get(LANG_ARRAY[<span class="hljs-number">2</span>])<br><span class="hljs-keyword">end</span><br><br></code></pre></td></tr></tbody></table></figure>
 <p>面对这些情况，正则就不够用了。为了实现对以上情况的查找，所以lua代码部分的查找工作使用语法树来完成，这里使用基于python的luaparser（也有基于JS的）。luaparser的官方文档：<a target="_blank" rel="noopener" href="https://pypi.org/project/luaparser/">https://pypi.org/project/luaparser/</a></p>
-<p>这里使用python是为了方便将python程序打包，因为大部分人的电脑中没有python环境，而且我们不可能在插件中内嵌一个python环境，所有最后需要将python代码打包成exe程序。<br><img src="/2024/09/08/Unity%E6%9C%AC%E5%9C%B0%E5%8C%96id%E6%9F%A5%E6%89%BE%E5%99%A8%EF%BC%8Cluaparser%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E6%9F%A5%E6%89%BE/ab08540f88b54bdb90e4c4d1669bd658.png" srcset="/img/loading.gif" lazyload alt="请添加图片描述"></p>
+<p>这里使用python是为了方便将python程序打包，因为大部分人的电脑中没有python环境，而且我们不可能在插件中内嵌一个python环境，所有最后需要将python代码打包成exe程序。<br><img src="/2024/09/08/Unity%E6%9C%AC%E5%9C%B0%E5%8C%96id%E6%9F%A5%E6%89%BE%E5%99%A8%EF%BC%8Cluaparser%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E6%9F%A5%E6%89%BE/ab08540f88b54bdb90e4c4d1669bd658.png" srcset="/img/loading.gif" lazyload="" alt="请添加图片描述"></p>
 <p>上面是整套python代码的执行流程，简单来说就是首先找出差异文件，然后生成lua代码的语法树，然后找到所有的本地化id，最后将查找的结果进行序列化并以JSON格式保存在本地。C#层会读取该JSON文件，从而查找对应id。</p>
 <p>P.S. 原本没有差异文件对比的，后来实际运行发现速度太慢了，构建2000个lua文件的索引大概需要8分钟左右，完全接受不了。后面加入差异化文件对比之后每次构建时间缩短到了1分钟以内，速度大大提高。</p>
 <p>下面对python代码进行简单介绍</p>
 <blockquote>
 <p>ast.walk(tree)：获取树结构进行遍历<br>isinstance(node, astnodes.Call) ：判断该节点是否是函数调用（.调用lua的函数）<br>isinstance(node, astnodes.Invoke) ：判断该节点是否是函数调用（：调用lua的函数）<br>isinstance(node.func, astnodes.Name)：判断是否是lua的命名表达式</p>
 </blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 查找调用指定函数的Node</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">FindFuncNude</span>(<span class="hljs-params">tree, funcName = <span class="hljs-string">&quot;lang.Get&quot;</span></span>):<br>    funcList = []<br>    funcInfo = funcName.split(<span class="hljs-string">&#x27;.&#x27;</span>)<br>    <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> ast.walk(tree):<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node, astnodes.Call) <span class="hljs-keyword">or</span> <span class="hljs-built_in">isinstance</span>(node, astnodes.Invoke):<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node.func, astnodes.Index):<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node.func.value, astnodes.Name) <span class="hljs-keyword">and</span> funcInfo[<span class="hljs-number">0</span>] == node.func.value.<span class="hljs-built_in">id</span>:<br>                    <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node.func.idx, astnodes.Name) <span class="hljs-keyword">and</span> funcInfo[<span class="hljs-number">1</span>] == node.func.idx.<span class="hljs-built_in">id</span>:<br>                        funcList.append(node)<br>                        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;lang.Get line-&gt;&quot;</span>, node.line)<br>            <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(node.func, astnodes.Name):<br>                <span class="hljs-keyword">if</span> node.func.<span class="hljs-built_in">id</span> == funcName :<br>                    funcList.append(node)<br>                    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;lang.Get-&gt;&quot;</span>, node.line)<br>    <span class="hljs-keyword">return</span> funcList<br><br><span class="hljs-comment">#获取table里面所有的键值对</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">GetTableKeyValuePairs</span>(<span class="hljs-params">tableNode</span>):<br>    <span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">    :param tableNode: table 节点</span><br><span class="hljs-string">    :return: key：变量名，value：变量的节点</span><br><span class="hljs-string">    &#x27;&#x27;&#x27;</span><br>    keyValueList = &#123;&#125;<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(tableNode, astnodes.Table):<br>        <span class="hljs-keyword">for</span> pair <span class="hljs-keyword">in</span> tableNode.fields :<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(pair.key, astnodes.Name) <span class="hljs-keyword">and</span> <span class="hljs-built_in">isinstance</span>(pair.value, astnodes.Number) :          <span class="hljs-comment">#解析哈希表</span><br>                keyValueList[pair.key.<span class="hljs-built_in">id</span>] = pair.value<br>            <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(pair.key, astnodes.Number) <span class="hljs-keyword">and</span> <span class="hljs-built_in">isinstance</span>(pair.value, astnodes.Number) :        <span class="hljs-comment">#解析数组</span><br>                keyValueList[<span class="hljs-built_in">str</span>(pair.key.n)] = pair.value<br>    <span class="hljs-keyword">return</span> keyValueList<br><br><span class="hljs-comment">#获取文件里面所有的局部变量</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">FindAllVariable</span>(<span class="hljs-params">tree</span>):<br>    <span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">    :param tree: ast树</span><br><span class="hljs-string">    :return: key：变量名，value：&#123;value：变量值，node: 节点&#125;</span><br><span class="hljs-string">    &#x27;&#x27;&#x27;</span><br>    varList = &#123;&#125;<br>    <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> ast.walk(tree):<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node, astnodes.LocalAssign):<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(node.targets) &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> <span class="hljs-built_in">len</span>(node.values) &gt; <span class="hljs-number">0</span> :<br>                tempVar = node.targets[<span class="hljs-number">0</span>]<br>                tempValue = node.values[<span class="hljs-number">0</span>]<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(tempVar, astnodes.Name) <span class="hljs-keyword">and</span> <span class="hljs-built_in">isinstance</span>(tempValue, astnodes.Number):    <span class="hljs-comment">#等号左边是变量  等号右边是字面量</span><br>                    varList[tempVar.<span class="hljs-built_in">id</span>] = &#123;<span class="hljs-string">&quot;value&quot;</span> : tempValue.n, <span class="hljs-string">&quot;node&quot;</span>: tempValue&#125;<br>                <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(tempVar, astnodes.Name) <span class="hljs-keyword">and</span> <span class="hljs-built_in">isinstance</span>(tempValue, astnodes.Table):   <span class="hljs-comment">#等号左边是变量  等号右边是table</span><br>                    keyValueList = GetTableKeyValuePairs(tempValue)<br>                    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> keyValueList :<br>                        varList[tempVar.<span class="hljs-built_in">id</span> + <span class="hljs-string">&quot;.&quot;</span> + key] = &#123;<span class="hljs-string">&quot;value&quot;</span> : keyValueList[key].n, <span class="hljs-string">&quot;node&quot;</span>: keyValueList[key]&#125;<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;---------------------------------&quot;</span>)<br>    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> varList :<br>        <span class="hljs-built_in">print</span>(key,<span class="hljs-string">&quot;=&quot;</span>, varList[key][<span class="hljs-string">&quot;value&quot;</span>])<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;---------------------------------&quot;</span>)<br>    <span class="hljs-keyword">return</span> varList<br></code></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 查找调用指定函数的Node</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">FindFuncNude</span>(<span class="hljs-params">tree, funcName = <span class="hljs-string">"lang.Get"</span></span>):<br>    funcList = []<br>    funcInfo = funcName.split(<span class="hljs-string">'.'</span>)<br>    <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> ast.walk(tree):<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node, astnodes.Call) <span class="hljs-keyword">or</span> <span class="hljs-built_in">isinstance</span>(node, astnodes.Invoke):<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node.func, astnodes.Index):<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node.func.value, astnodes.Name) <span class="hljs-keyword">and</span> funcInfo[<span class="hljs-number">0</span>] == node.func.value.<span class="hljs-built_in">id</span>:<br>                    <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node.func.idx, astnodes.Name) <span class="hljs-keyword">and</span> funcInfo[<span class="hljs-number">1</span>] == node.func.idx.<span class="hljs-built_in">id</span>:<br>                        funcList.append(node)<br>                        <span class="hljs-built_in">print</span>(<span class="hljs-string">"lang.Get line-&gt;"</span>, node.line)<br>            <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(node.func, astnodes.Name):<br>                <span class="hljs-keyword">if</span> node.func.<span class="hljs-built_in">id</span> == funcName :<br>                    funcList.append(node)<br>                    <span class="hljs-built_in">print</span>(<span class="hljs-string">"lang.Get-&gt;"</span>, node.line)<br>    <span class="hljs-keyword">return</span> funcList<br><br><span class="hljs-comment">#获取table里面所有的键值对</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">GetTableKeyValuePairs</span>(<span class="hljs-params">tableNode</span>):<br>    <span class="hljs-string">'''</span><br><span class="hljs-string">    :param tableNode: table 节点</span><br><span class="hljs-string">    :return: key：变量名，value：变量的节点</span><br><span class="hljs-string">    '''</span><br>    keyValueList = {}<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(tableNode, astnodes.Table):<br>        <span class="hljs-keyword">for</span> pair <span class="hljs-keyword">in</span> tableNode.fields :<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(pair.key, astnodes.Name) <span class="hljs-keyword">and</span> <span class="hljs-built_in">isinstance</span>(pair.value, astnodes.Number) :          <span class="hljs-comment">#解析哈希表</span><br>                keyValueList[pair.key.<span class="hljs-built_in">id</span>] = pair.value<br>            <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(pair.key, astnodes.Number) <span class="hljs-keyword">and</span> <span class="hljs-built_in">isinstance</span>(pair.value, astnodes.Number) :        <span class="hljs-comment">#解析数组</span><br>                keyValueList[<span class="hljs-built_in">str</span>(pair.key.n)] = pair.value<br>    <span class="hljs-keyword">return</span> keyValueList<br><br><span class="hljs-comment">#获取文件里面所有的局部变量</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">FindAllVariable</span>(<span class="hljs-params">tree</span>):<br>    <span class="hljs-string">'''</span><br><span class="hljs-string">    :param tree: ast树</span><br><span class="hljs-string">    :return: key：变量名，value：{value：变量值，node: 节点}</span><br><span class="hljs-string">    '''</span><br>    varList = {}<br>    <span class="hljs-keyword">for</span> node <span class="hljs-keyword">in</span> ast.walk(tree):<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(node, astnodes.LocalAssign):<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(node.targets) &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> <span class="hljs-built_in">len</span>(node.values) &gt; <span class="hljs-number">0</span> :<br>                tempVar = node.targets[<span class="hljs-number">0</span>]<br>                tempValue = node.values[<span class="hljs-number">0</span>]<br>                <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(tempVar, astnodes.Name) <span class="hljs-keyword">and</span> <span class="hljs-built_in">isinstance</span>(tempValue, astnodes.Number):    <span class="hljs-comment">#等号左边是变量  等号右边是字面量</span><br>                    varList[tempVar.<span class="hljs-built_in">id</span>] = {<span class="hljs-string">"value"</span> : tempValue.n, <span class="hljs-string">"node"</span>: tempValue}<br>                <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(tempVar, astnodes.Name) <span class="hljs-keyword">and</span> <span class="hljs-built_in">isinstance</span>(tempValue, astnodes.Table):   <span class="hljs-comment">#等号左边是变量  等号右边是table</span><br>                    keyValueList = GetTableKeyValuePairs(tempValue)<br>                    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> keyValueList :<br>                        varList[tempVar.<span class="hljs-built_in">id</span> + <span class="hljs-string">"."</span> + key] = {<span class="hljs-string">"value"</span> : keyValueList[key].n, <span class="hljs-string">"node"</span>: keyValueList[key]}<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">"---------------------------------"</span>)<br>    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> varList :<br>        <span class="hljs-built_in">print</span>(key,<span class="hljs-string">"="</span>, varList[key][<span class="hljs-string">"value"</span>])<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">"---------------------------------"</span>)<br>    <span class="hljs-keyword">return</span> varList<br></code></pre></td></tr></tbody></table></figure>
 <p>至此，C#端只需要读取python端生成的json文件就可以获取lua的索引信息了，C#端的代码不做信息介绍。完整代码附在末尾的链接里面。</p>
 <h4 id="查找预制体中的本地化id"><a href="#查找预制体中的本地化id" class="headerlink" title="查找预制体中的本地化id"></a>查找预制体中的本地化id</h4><p>下面介绍如何查找预制体中的本地化id。首先获取所有预制体的路径，然后依次遍历这些路径，使用AssetDatabase.LoadAssetAtPath实例化预制，然后搜索对应的本地化脚本组件即可。</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Dictionary&lt;<span class="hljs-built_in">int</span> ,Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;<span class="hljs-built_in">string</span>&gt;&gt;&gt; Finder(<span class="hljs-built_in">string</span> prefabPath, HashSet&lt;<span class="hljs-built_in">int</span>&gt; langIDSet)<br>&#123;<br>    List&lt;<span class="hljs-built_in">string</span>&gt; allPrefabDir = Util.GetAllPrefabDir(prefabPath);<br>    Dictionary&lt;<span class="hljs-built_in">int</span> ,Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;<span class="hljs-built_in">string</span>&gt;&gt;&gt; resDic = <span class="hljs-keyword">new</span> Dictionary&lt;<span class="hljs-built_in">int</span> ,Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;<span class="hljs-built_in">string</span>&gt;&gt;&gt;();<br>    <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> dir <span class="hljs-keyword">in</span> allPrefabDir)<br>    &#123;<br>        GameObject prefab = AssetDatabase.LoadAssetAtPath&lt;GameObject&gt;(dir);<br>        <span class="hljs-keyword">if</span> (prefab != <span class="hljs-literal">null</span>)<br>        &#123;<br>            LocalizationText[] localizeTextList = prefab.GetComponentsInChildren&lt;LocalizationText&gt;(<span class="hljs-literal">true</span>);<br>            <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> localizeText <span class="hljs-keyword">in</span> localizeTextList)<br>            &#123;<br>                <span class="hljs-built_in">int</span> compLangID = localizeText.TextKey;<br>                <span class="hljs-comment">// 如果找到了</span><br>                <span class="hljs-keyword">if</span> (langIDSet.Contains(compLangID))<br>                &#123;<br>                    <span class="hljs-keyword">if</span> (!resDic.ContainsKey(compLangID))<br>                    &#123;<br>                        resDic[compLangID] = <span class="hljs-keyword">new</span> Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;<span class="hljs-built_in">string</span>&gt;&gt;();<br>                    &#125;<br><br>                    <span class="hljs-keyword">if</span> (!resDic[compLangID].ContainsKey(dir))<br>                    &#123;<br>                        resDic[compLangID][dir] = <span class="hljs-keyword">new</span> List&lt;<span class="hljs-built_in">string</span>&gt;();<br>                    &#125;<br>                    <br>                    resDic[compLangID][dir].Add(Util.GetRoute(localizeText.transform));<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> resDic;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Dictionary&lt;<span class="hljs-built_in">int</span> ,Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;<span class="hljs-built_in">string</span>&gt;&gt;&gt; Finder(<span class="hljs-built_in">string</span> prefabPath, HashSet&lt;<span class="hljs-built_in">int</span>&gt; langIDSet)<br>{<br>    List&lt;<span class="hljs-built_in">string</span>&gt; allPrefabDir = Util.GetAllPrefabDir(prefabPath);<br>    Dictionary&lt;<span class="hljs-built_in">int</span> ,Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;<span class="hljs-built_in">string</span>&gt;&gt;&gt; resDic = <span class="hljs-keyword">new</span> Dictionary&lt;<span class="hljs-built_in">int</span> ,Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;<span class="hljs-built_in">string</span>&gt;&gt;&gt;();<br>    <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> dir <span class="hljs-keyword">in</span> allPrefabDir)<br>    {<br>        GameObject prefab = AssetDatabase.LoadAssetAtPath&lt;GameObject&gt;(dir);<br>        <span class="hljs-keyword">if</span> (prefab != <span class="hljs-literal">null</span>)<br>        {<br>            LocalizationText[] localizeTextList = prefab.GetComponentsInChildren&lt;LocalizationText&gt;(<span class="hljs-literal">true</span>);<br>            <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> localizeText <span class="hljs-keyword">in</span> localizeTextList)<br>            {<br>                <span class="hljs-built_in">int</span> compLangID = localizeText.TextKey;<br>                <span class="hljs-comment">// 如果找到了</span><br>                <span class="hljs-keyword">if</span> (langIDSet.Contains(compLangID))<br>                {<br>                    <span class="hljs-keyword">if</span> (!resDic.ContainsKey(compLangID))<br>                    {<br>                        resDic[compLangID] = <span class="hljs-keyword">new</span> Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;<span class="hljs-built_in">string</span>&gt;&gt;();<br>                    }<br><br>                    <span class="hljs-keyword">if</span> (!resDic[compLangID].ContainsKey(dir))<br>                    {<br>                        resDic[compLangID][dir] = <span class="hljs-keyword">new</span> List&lt;<span class="hljs-built_in">string</span>&gt;();<br>                    }<br>                    <br>                    resDic[compLangID][dir].Add(Util.GetRoute(localizeText.transform));<br>                }<br>            }<br>        }<br>    }<br><br>    <span class="hljs-keyword">return</span> resDic;<br>}<br></code></pre></td></tr></tbody></table></figure>
 
 <h3 id="代码自取："><a href="#代码自取：" class="headerlink" title="代码自取："></a>代码自取：</h3><p>langIDFinder 文件为unity插件的代码，其中的python代码位于main.py中<br><a target="_blank" rel="noopener" href="https://github.com/momohola/Localization-ID-Finder-by-luaparser">https://github.com/momohola/Localization-ID-Finder-by-luaparser</a></p>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script><div id="posts-chart" style="border-radius: 8px; height: 190px; padding: 10px;"></div>
+  <script id="postsChart" type="text/javascript">
+    var postsChart = echarts.init(document.getElementById('posts-chart'), document.documentElement.getAttribute('data-user-color-scheme'));
+    window.onresize = function() {
+      postsChart.resize();
+      };
+    let dataPosts = [{"title":"Unity英文自动添加连词符“-”","date":"2024-05-26","wordcount":"1.13","path":"2024/05/26/Unity-hyphen/"},{"title":"Unity泰语支持以及泰语显示bug解决","date":"2024-08-08","wordcount":"1.02","path":"2024/08/08/Unity泰语支持以及泰语显示bug解决/"},{"title":"Unity本地化id查找器，luaparser函数参数查找","date":"2024-09-08","wordcount":"1.52","path":"2024/09/08/Unity本地化id查找器，luaparser函数参数查找/"},{"title":"计算机图形学GAMES101（一）向量与线性代数","date":"2024-05-26","wordcount":"0.55","path":"2024/05/26/计算机图形学GAMES101（一）向量与线性代数/"},{"title":"C++设计模式（全23种）","date":"2024-05-26","wordcount":"16.95","path":"2024/05/26/C-设计模式（全23种）/"},{"title":"计算机图形学GAMES101（七）着色（着色频率、图形管线、纹理映射）","date":"2024-05-26","wordcount":"1.18","path":"2024/05/26/计算机图形学GAMES101（七）着色（着色频率、图形管线、纹理映射）/"},{"title":"计算机图形学GAMES101（三）变换（模型、视图、投影）","date":"2024-05-26","wordcount":"1.03","path":"2024/05/26/计算机图形学GAMES101（三）变换（模型、视图、投影）/"},{"title":"计算机图形学GAMES101（二）变换","date":"2024-05-26","wordcount":"0.77","path":"2024/05/26/计算机图形学GAMES101（二）变换/"},{"title":"计算机图形学GAMES101（九）几何（基本表示方法）","date":"2024-05-26","wordcount":"1.53","path":"2024/05/26/计算机图形学GAMES101（九）几何（基本表示方法）/"},{"title":"计算机图形学GAMES101（八）着色（插值、高级纹理映射）","date":"2024-05-26","wordcount":"2.35","path":"2024/05/26/计算机图形学GAMES101（八）着色（插值、高级纹理映射）/"},{"title":"计算机图形学GAMES101（五）光栅化（深度测试与抗锯齿）","date":"2024-05-26","wordcount":"1.59","path":"2024/05/26/计算机图形学GAMES101（五）光栅化（深度测试与抗锯齿）/"},{"title":"计算机图形学GAMES101（六）着色（光照与基本着色模型）","date":"2024-05-26","wordcount":"0.64","path":"2024/05/26/计算机图形学GAMES101（六）着色（光照与基本着色模型）/"},{"title":"计算机图形学GAMES101（十三）光线追踪（加速结构）","date":"2024-05-26","wordcount":"1.59","path":"2024/05/26/计算机图形学GAMES101（十三）光线追踪（加速结构）/"},{"title":"计算机图形学GAMES101（十一）几何（网格处理）","date":"2024-05-26","wordcount":"0.97","path":"2024/05/26/计算机图形学GAMES101（十一）几何（网格处理）/"},{"title":"计算机图形学GAMES101（十五）光线追踪（蒙特卡洛积分与路径追踪）","date":"2024-05-26","wordcount":"2.16","path":"2024/05/26/计算机图形学GAMES101（十五）光线追踪（蒙特卡洛积分与路径追踪）/"},{"title":"计算机图形学GAMES101（十二）光线追踪（基本原理）","date":"2024-05-26","wordcount":"2.71","path":"2024/05/26/计算机图形学GAMES101（十二）光线追踪（基本原理）/"},{"title":"计算机图形学GAMES101（十）几何（曲线与曲面）","date":"2024-05-26","wordcount":"0.98","path":"2024/05/26/计算机图形学GAMES101（十）几何（曲线与曲面）/"},{"title":"计算机图形学GAMES101（四）光栅化（三角形的离散化）","date":"2024-05-26","wordcount":"0.42","path":"2024/05/26/计算机图形学GAMES101（四）光栅化（三角形的离散化）/"},{"title":"计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）","date":"2024-05-26","wordcount":"2.20","path":"2024/05/26/计算机图形学GAMES101（十四）光线追踪（辐射度量学、渲染方程与全局光照）/"}]
+    const dataMap = new Map(dataPosts.map((obj) => [obj.date, {title: obj.title, wordCount: obj.wordcount, path: obj.path}]));
+
+    function heatmap_width(months){
+        var startDate = new Date();
+        var mill = startDate.setMonth((startDate.getMonth() - months));
+        var endDate = +new Date();
+        startDate = +new Date(mill);
+        endDate = echarts.format.formatTime('yyyy-MM-dd', endDate);
+        startDate = echarts.format.formatTime('yyyy-MM-dd', startDate);
+        var showmonth = [];
+        showmonth.push([
+            startDate,
+            endDate
+        ]);
+        return showmonth
+    };
+
+    function getRangeArr() {
+        const windowWidth = window.innerWidth;
+        if (windowWidth >= 600) {
+          return heatmap_width(12);
+        }
+        else if (windowWidth >= 400) {
+          return heatmap_width(9);
+        }
+        else {
+          return heatmap_width(6);
+        }
+    }
+
+    var postsOption = {
+    title: {
+        top: 0,
+        left: 'center',
+        text: '博客热力图'
+    },
+    tooltip: {
+      formatter: function (p) {
+        const post = dataMap.get(p.data[0]);
+        return post.title + ' | ' + post.wordCount + ' 千字';
+      }
+    },
+    visualMap: {
+        min: 0,
+        max: 10,
+        type: 'piecewise',
+        orient: 'horizontal',
+        left: 'center',
+        top: 30,
+        inRange: {
+          //  [floor color, ceiling color]
+          color: ['#c0b5c8', '#746184' ]
+        },
+        splitNumber: 4,
+        text: ['千字', ''],
+        showLabel: true,
+        itemGap: 20,
+    },
+    calendar: {
+        top: 80,
+        left: 20,
+        right: 4,
+        cellSize: ['auto', 12],
+        range: getRangeArr(),
+        itemStyle: {
+            color: '#F1F1F1',
+            borderWidth: 2.5,
+            borderColor: '#fff',
+        },
+        yearLabel: { show: false },
+        // the splitline between months
+        splitLine: {
+          lineStyle: {
+            color: "#000",
+            width: 1,
+            type: "solid",
+          }
+        }
+    },
+    series: {
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: [["2024-05-26",1.131],["2024-08-08",1.021],["2024-09-08",1.519],["2024-05-26",0.553],["2024-05-26",16.952],["2024-05-26",1.182],["2024-05-26",1.027],["2024-05-26",0.773],["2024-05-26",1.53],["2024-05-26",2.345],["2024-05-26",1.594],["2024-05-26",0.643],["2024-05-26",1.592],["2024-05-26",0.975],["2024-05-26",2.159],["2024-05-26",2.71],["2024-05-26",0.978],["2024-05-26",0.422],["2024-05-26",2.197]]
+    }
+  };
+
+    postsChart.setOption(postsOption);
+    window.addEventListener('resize', () => {
+      postsChart.resize();
+    });
+    postsChart.on('click', function(params) {
+      const post = dataMap.get(params.data[0]);
+      const link = window.location.origin + "/" + post.path;
+      window.open(link, '_blank').focus();
+});
+    document.body.addEventListener('click', function(e) {
+        if (document.documentElement.getAttribute('data-user-color-scheme')==='dark') {
+            postsChart.dispose();
+            postsChart = echarts.init(document.getElementById('posts-chart'), 'dark');
+            postsChart.setOption(postsOption);
+            postsChart.on('click', function(params) {
+                  const post = dataMap.get(params.data[0]);
+                  const link = window.location.origin + "/" + post.path;
+                  window.open(link, '_blank').focus();
+            });
+        } else {
+            postsChart.dispose();
+            postsChart = echarts.init(document.getElementById('posts-chart'), 'light');
+            postsChart.setOption(postsOption);
+            postsChart.on('click', function(params) {
+              const post = dataMap.get(params.data[0]);
+              const link = window.location.origin + "/" + post.path;
+              window.open(link, '_blank').focus();
+        });
+        }
+    });
+  </script>
 
                 
               </div>
             
-            <hr/>
+            <hr>
             <div>
               <div class="post-metas my-3">
   
@@ -441,7 +555,7 @@
             
   
   
-    <article id="comments" lazyload>
+    <article id="comments" lazyload="">
       
 
     </article>
@@ -510,14 +624,13 @@
     
 
     
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header text-center">
         <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
         <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+          <span aria-hidden="true">×</span>
         </button>
       </div>
       <div class="modal-body mx-3">
@@ -576,8 +689,8 @@
 
   <!-- Scripts -->
   
-  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+  <script src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js"></script>
+  <link rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css">
 
   <script>
     NProgress.configure({"showSpinner":false,"trickleSpeed":100})
@@ -588,13 +701,13 @@
   </script>
 
 
-<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
-<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
+<script src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js"></script>
+<script src="/js/events.js"></script>
+<script src="/js/plugins.js"></script>
 
 
-  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js"></script>
   <script>
     (function (window, document) {
       var typing = Fluid.plugins.typing;
@@ -613,7 +726,7 @@
 
 
   
-    <script  src="/js/img-lazyload.js" ></script>
+    <script src="/js/img-lazyload.js"></script>
   
 
 
@@ -659,7 +772,7 @@
 </script>
 
 
-  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+  <script src="https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js"></script>
 
   <script>Fluid.plugins.codeWidget();</script>
 
@@ -712,9 +825,9 @@
 
   <script>Fluid.plugins.imageCaption();</script>
 
-  <script defer src="/js/leancloud.js" ></script>
+  <script defer="" src="/js/leancloud.js"></script>
 
-  <script  src="/js/local-search.js" ></script>
+  <script src="/js/local-search.js"></script>
 
 
 
@@ -727,7 +840,7 @@
 
 <!-- 主题的启动项，将它保持在最底部 -->
 <!-- the boot of the theme, keep it at the bottom -->
-<script  src="/js/boot.js" ></script>
+<script src="/js/boot.js"></script>
 
 
   
@@ -735,5 +848,6 @@
   <noscript>
     <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
   </noscript>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/kasumi_event128.model.json"},"display":{"superSample":2,"width":200,"height":400,"position":"left","hOffset":20,"vOffset":0},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"dialog":{"enable":true,"text":["pop，pipapipa~","这里不可以","星星在天上而你在我心里ヾ(≧▽≦*)o"]},"log":false});</script></body>
-</html>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/kasumi_event128.model.json"},"display":{"superSample":2,"width":200,"height":400,"position":"left","hOffset":20,"vOffset":0},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"dialog":{"enable":true,"text":["pop，pipapipa~","这里不可以","星星在天上而你在我心里ヾ(≧▽≦*)o"]},"log":false});</script>
+
+</body></html>
